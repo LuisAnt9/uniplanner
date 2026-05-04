@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniPlanner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f14;
+      --bg2: #13161e;
+      --bg3: #1a1e2a;
+      --border: #ffffff12;
+      --border2: #ffffff20;
+      --text: #e8eaf0;
+      --muted: #6b7080;
+      --accent: #7c6fef;
+      --accent2: #a89cf5;
+      --green: #34d399;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --orange: #fb923c;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 0;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      padding: 0 24px 28px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+      color: #fff;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo span { color: var(--accent2); }
+
+    .nav { padding: 20px 12px; flex: 1; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 0.15s;
+      margin-bottom: 2px;
+    }
+
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active { background: #7c6fef20; color: var(--accent2); }
+
+    .nav-item .icon { font-size: 18px; width: 22px; text-align: center; }
+
+    .sidebar-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* MAIN */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      min-height: 100vh;
+    }
+
+    .page { display: none; padding: 36px 40px; }
+    .page.active { display: block; }
+
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .page-subtitle { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #6b5fde; }
+    .btn-ghost { background: var(--bg3); color: var(--text); border: 1px solid var(--border2); }
+    .btn-ghost:hover { background: var(--border); }
+    .btn-danger { background: #f8717120; color: var(--red); border: 1px solid #f8717130; }
+    .btn-danger:hover { background: #f8717130; }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+    /* STATS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .stat-value { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; color: #fff; }
+    .stat-accent { color: var(--accent2); }
+
+    /* TASK LIST */
+    .tasks-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .task-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: border-color 0.15s;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .task-card:hover { border-color: var(--border2); }
+    .task-card.done { opacity: 0.45; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .task-check {
+      width: 22px; height: 22px;
+      border: 2px solid var(--border2);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+      font-size: 13px;
+    }
+
+    .task-check:hover { border-color: var(--green); background: #34d39918; }
+    .task-check.checked { background: var(--green); border-color: var(--green); color: #000; }
+
+    .task-info { flex: 1; min-width: 0; }
+    .task-title { font-weight: 500; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-title.done { text-decoration: line-through; color: var(--muted); }
+    .task-meta { display: flex; gap: 10px; margin-top: 5px; align-items: center; flex-wrap: wrap; }
+
+    .badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-subject { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+    .badge-date { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+    .badge-critica { background: #f8717120; color: var(--red); }
+    .badge-alta { background: #fb923c20; color: var(--orange); }
+    .badge-media { background: #fbbf2420; color: var(--yellow); }
+    .badge-baixa { background: #34d39918; color: var(--green); }
+    .badge-diff { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+
+    .task-actions { display: flex; gap: 6px; }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 16px;
+      transition: all 0.15s;
+    }
+
+    .icon-btn:hover { background: var(--bg3); color: var(--text); }
+    .icon-btn.delete:hover { color: var(--red); }
+
+    /* FILTERS */
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover, .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: #00000080;
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 18px;
+      padding: 32px;
+      width: 480px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: none; } }
+
+    .modal-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #fff;
+    }
+
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    select option { background: var(--bg3); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+    /* STARS */
+    .stars { display: flex; gap: 4px; }
+
+    .star {
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--border2);
+      transition: color 0.1s;
+    }
+
+    .star.active { color: var(--yellow); }
+
+    /* EVENTS */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .event-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .event-type-badge {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .type-prova { background: #f8717120; color: var(--red); }
+    .type-trabalho { background: #fbbf2420; color: var(--yellow); }
+    .type-reunião { background: #7c6fef20; color: var(--accent2); }
+    .type-outro { background: var(--bg3); color: var(--muted); }
+
+    .event-title { font-weight: 600; font-size: 16px; margin-bottom: 8px; }
+    .event-date { font-size: 13px; color: var(--muted); }
+    .event-desc { font-size: 13px; color: var(--muted); margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+
+    /* SUBJECTS */
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .subject-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      animation: fadeIn 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .subject-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .subject-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; margin-top: 10px; margin-bottom: 10px; }
+    .subject-info { font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+
+    /* EMPTY */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 48px; margin-bottom: 14px; opacity: 0.4; }
+    .empty-text { font-size: 15px; }
+
+    /* LOADING */
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 20px 0;
+    }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 14px;
+      z-index: 9999;
+      animation: toastIn 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 320px;
+    }
+
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    .color-picker-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+    .color-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.1s;
+    }
+    .color-dot:hover, .color-dot.selected { transform: scale(1.2); border-color: #fff4; }
+
+    @media (max-width: 900px) {
+      .sidebar { width: 60px; }
+      .nav-item span, .logo span:last-child, .sidebar-footer { display: none; }
+      .main { margin-left: 60px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .page { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">Uni<span>Planner</span></div>
+  <nav class="nav">
+    <div class="nav-item active" onclick="navigate('dashboard')">
+      <span class="icon">🏠</span><span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="navigate('tasks')">
+      <span class="icon">✅</span><span>Tarefas</span>
+    </div>
+    <div class="nav-item" onclick="navigate('events')">
+      <span class="icon">📅</span><span>Eventos</span>
+    </div>
+    <div class="nav-item" onclick="navigate('subjects')">
+      <span class="icon">📚</span><span>Matérias</span>
+    </div>
+  </nav>
+  <div class="sidebar-footer">v2.0.0</div>
+</aside>
+
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard 🎓</div>
+        <div class="page-subtitle" id="dashboard-date"></div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Tarefas Pendentes</div>
+        <div class="stat-value stat-accent" id="stat-pending">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Concluídas</div>
+        <div class="stat-value" id="stat-done">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Próximos Eventos</div>
+        <div class="stat-value" id="stat-events">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Matérias</div>
+        <div class="stat-value" id="stat-subjects">—</div>
+      </div>
+    </div>
+
+    <div class="page-title" style="font-size:18px;margin-bottom:16px;">Tarefas Urgentes 🔥</div>
+    <div id="dashboard-tasks"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+  </div>
+
+  <!-- TASKS -->
+  <div class="page" id="page-tasks">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Tarefas</div>
+        <div class="page-subtitle">Gerencie suas atividades e trabalhos</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('task')">＋ Nova Tarefa</button>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all', this)">Todas</button>
+      <button class="filter-btn" onclick="setFilter('pending', this)">Pendentes</button>
+      <button class="filter-btn" onclick="setFilter('done', this)">Concluídas</button>
+      <button class="filter-btn" onclick="setFilter('critica', this)">🔴 Crítica</button>
+      <button class="filter-btn" onclick="setFilter('alta', this)">🟠 Alta</button>
+    </div>
+
+    <div id="tasks-list"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+  </div>
+
+  <!-- EVENTS -->
+  <div class="page" id="page-events">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Eventos</div>
+        <div class="page-subtitle">Provas, trabalhos e compromissos</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('event')">＋ Novo Evento</button>
+    </div>
+    <div id="events-list"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+  </div>
+
+  <!-- SUBJECTS -->
+  <div class="page" id="page-subjects">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Matérias</div>
+        <div class="page-subtitle">Suas disciplinas do semestre</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('subject')">＋ Nova Matéria</button>
+    </div>
+    <div id="subjects-list"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+  </div>
+
+</main>
+
+<!-- MODAL TASK -->
+<div class="modal-overlay" id="modal-task">
+  <div class="modal">
+    <div class="modal-title">✅ Nova Tarefa</div>
+    <div class="form-group">
+      <label>Título *</label>
+      <input id="task-title" type="text" placeholder="Ex: Trabalho de Cálculo..." />
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea id="task-desc" placeholder="Detalhes da tarefa..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Prazo *</label>
+        <input id="task-due" type="datetime-local" />
+      </div>
+      <div class="form-group">
+        <label>Matéria</label>
+        <select id="task-subject">
+          <option value="">Nenhuma</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Dificuldade</label>
+      <div class="stars" id="stars">
+        <span class="star" onclick="setStar(1)">★</span>
+        <span class="star" onclick="setStar(2)">★</span>
+        <span class="star" onclick="setStar(3)">★</span>
+        <span class="star" onclick="setStar(4)">★</span>
+        <span class="star" onclick="setStar(5)">★</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('task')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTask()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EVENT -->
+<div class="modal-overlay" id="modal-event">
+  <div class="modal">
+    <div class="modal-title">📅 Novo Evento</div>
+    <div class="form-group">
+      <label>Título *</label>
+      <input id="event-title" type="text" placeholder="Ex: Prova de Física..." />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data *</label>
+        <input id="event-date" type="date" />
+      </div>
+      <div class="form-group">
+        <label>Horário</label>
+        <input id="event-time" type="time" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Tipo</label>
+      <select id="event-type">
+        <option value="prova">🔴 Prova</option>
+        <option value="trabalho">🟡 Trabalho</option>
+        <option value="reunião">🟣 Reunião</option>
+        <option value="outro">⚪ Outro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea id="event-desc" placeholder="Detalhes do evento..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('event')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEvent()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUBJECT -->
+<div class="modal-overlay" id="modal-subject">
+  <div class="modal">
+    <div class="modal-title">📚 Nova Matéria</div>
+    <div class="form-group">
+      <label>Nome *</label>
+      <input id="subj-name" type="text" placeholder="Ex: Cálculo II..." />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Professor</label>
+        <input id="subj-teacher" type="text" placeholder="Nome do professor" />
+      </div>
+      <div class="form-group">
+        <label>Horário</label>
+        <input id="subj-schedule" type="text" placeholder="Seg/Qua 10h" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Cor</label>
+      <div class="color-picker-row" id="color-picker"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('subject')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSubject()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+let tasks = [], events = [], subjects = [];
+let taskFilter = 'all';
+let selectedDiff = 1;
+let selectedColor = '#7c6fef';
+
+const COLORS = ['#7c6fef','#f87171','#34d399','#fbbf24','#60a5fa','#f472b6','#a3e635','#fb923c','#e879f9'];
+
+// === NAVIGATION ===
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'tasks') renderTasks();
+  if (page === 'events') renderEvents();
+  if (page === 'subjects') renderSubjects();
+}
+
+// === API ===
+async function fetchAll() {
+  try {
+    const [t, e, s] = await Promise.all([
+      fetch(API + '/tasks').then(r => r.json()),
+      fetch(API + '/events').then(r => r.json()),
+      fetch(API + '/subjects').then(r => r.json()),
+    ]);
+    tasks = t.data || [];
+    events = e.data || [];
+    subjects = s.data || [];
+  } catch(err) {
+    showToast('❌ Erro ao conectar com a API', true);
+  }
+}
+
+// === DASHBOARD ===
+function renderDashboard() {
+  const now = new Date();
+  document.getElementById('dashboard-date').textContent =
+    now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  const pending = tasks.filter(t => !t.completed);
+  const done = tasks.filter(t => t.completed);
+  const upcomingEvents = events.filter(e => new Date(e.date) >= now);
+
+  document.getElementById('stat-pending').textContent = pending.length;
+  document.getElementById('stat-done').textContent = done.length;
+  document.getElementById('stat-events').textContent = upcomingEvents.length;
+  document.getElementById('stat-subjects').textContent = subjects.length;
+
+  const urgent = pending
+    .sort((a, b) => (b.priority?.score || 0) - (a.priority?.score || 0))
+    .slice(0, 5);
+
+  const el = document.getElementById('dashboard-tasks');
+  if (!urgent.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div><div class="empty-text">Nenhuma tarefa urgente!</div></div>';
+    return;
+  }
+  el.innerHTML = '<div class="tasks-list">' + urgent.map(taskCard).join('') + '</div>';
+}
+
+// === TASKS ===
+function renderTasks() {
+  let filtered = [...tasks];
+  if (taskFilter === 'pending') filtered = filtered.filter(t => !t.completed);
+  if (taskFilter === 'done') filtered = filtered.filter(t => t.completed);
+  if (taskFilter === 'critica') filtered = filtered.filter(t => !t.completed && t.priority?.label === 'crítica');
+  if (taskFilter === 'alta') filtered = filtered.filter(t => !t.completed && t.priority?.label === 'alta');
+
+  const el = document.getElementById('tasks-list');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Nenhuma tarefa aqui.</div></div>';
+    return;
+  }
+  el.innerHTML = '<div class="tasks-list">' + filtered.map(taskCard).join('') + '</div>';
+}
+
+function taskCard(t) {
+  const subj = subjects.find(s => s._id === (t.subject?._id || t.subject));
+  const due = new Date(t.dueDate).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+  const pLabel = t.priority?.label || 'baixa';
+  const stars = '★'.repeat(t.difficulty) + '☆'.repeat(5 - t.difficulty);
+  return `
+    <div class="task-card ${t.completed ? 'done' : ''}" id="task-${t._id}">
+      <div class="task-check ${t.completed ? 'checked' : ''}" onclick="toggleTask('${t._id}', ${t.completed})">
+        ${t.completed ? '✓' : ''}
+      </div>
+      <div class="task-info">
+        <div class="task-title ${t.completed ? 'done' : ''}">${esc(t.title)}</div>
+        <div class="task-meta">
+          <span class="badge badge-${pLabel}">${priorityIcon(pLabel)} ${pLabel}</span>
+          <span class="badge badge-date">📅 ${due}</span>
+          ${subj ? `<span class="badge badge-subject" style="border-color:${subj.color}40;color:${subj.color}">${esc(subj.name)}</span>` : ''}
+          <span class="badge badge-diff" title="Dificuldade">${stars}</span>
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="icon-btn delete" onclick="deleteTask('${t._id}')" title="Deletar">🗑</button>
+      </div>
+    </div>`;
+}
+
+function priorityIcon(l) {
+  if (l === 'crítica') return '🔴';
+  if (l === 'alta') return '🟠';
+  if (l === 'média') return '🟡';
+  return '🟢';
+}
+
+async function toggleTask(id, isDone) {
+  if (isDone) return;
+  try {
+    const r = await fetch(`${API}/tasks/${id}/complete`, { method: 'PUT' });
+    const data = await r.json();
+    if (data.success) {
+      const idx = tasks.findIndex(t => t._id === id);
+      if (idx > -1) tasks[idx] = data.data;
+      renderTasks(); renderDashboard();
+      showToast('✅ Tarefa concluída!');
+    }
+  } catch { showToast('❌ Erro ao atualizar', true); }
+}
+
+async function deleteTask(id) {
+  if (!confirm('Deletar esta tarefa?')) return;
+  try {
+    const r = await fetch(`${API}/tasks/${id}`, { method: 'DELETE' });
+    const data = await r.json();
+    if (data.success) {
+      tasks = tasks.filter(t => t._id !== id);
+      renderTasks(); renderDashboard();
+      showToast('🗑 Tarefa deletada');
+    }
+  } catch { showToast('❌ Erro ao deletar', true); }
+}
+
+function setFilter(f, btn) {
+  taskFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks();
+}
+
+// === EVENTS ===
+function renderEvents() {
+  const el = document.getElementById('events-list');
+  if (!events.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><div class="empty-text">Nenhum evento cadastrado.</div></div>';
+    return;
+  }
+  const sorted = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
+  el.innerHTML = '<div class="events-grid">' + sorted.map(e => {
+    const d = new Date(e.date).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+    return `
+      <div class="event-card">
+        <span class="event-type-badge type-${e.type}">${e.type}</span>
+        <div class="event-title">${esc(e.title)}</div>
+        <div class="event-date">📅 ${d}${e.time ? ' às ' + e.time : ''}</div>
+        ${e.description ? `<div class="event-desc">${esc(e.description)}</div>` : ''}
+        <div style="margin-top:12px">
+          <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e._id}')">🗑 Deletar</button>
+        </div>
+      </div>`;
+  }).join('') + '</div>';
+}
+
+async function deleteEvent(id) {
+  if (!confirm('Deletar este evento?')) return;
+  try {
+    const r = await fetch(`${API}/events/${id}`, { method: 'DELETE' });
+    const data = await r.json();
+    if (data.success) {
+      events = events.filter(e => e._id !== id);
+      renderEvents(); renderDashboard();
+      showToast('🗑 Evento deletado');
+    }
+  } catch { showToast('❌ Erro ao deletar', true); }
+}
+
+// === SUBJECTS ===
+function renderSubjects() {
+  const el = document.getElementById('subjects-list');
+  if (!subjects.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📚</div><div class="empty-text">Nenhuma matéria cadastrada.</div></div>';
+    return;
+  }
+  el.innerHTML = '<div class="subjects-grid">' + subjects.map(s => `
+    <div class="subject-card">
+      <div class="subject-bar" style="background:${s.color}"></div>
+      <div class="subject-name">${esc(s.name)}</div>
+      <div class="subject-info">
+        ${s.teacher ? `<span>👤 ${esc(s.teacher)}</span>` : ''}
+        ${s.schedule ? `<span>🕐 ${esc(s.schedule)}</span>` : ''}
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn btn-danger btn-sm" onclick="deleteSubject('${s._id}')">🗑 Deletar</button>
+      </div>
+    </div>`).join('') + '</div>';
+}
+
+async function deleteSubject(id) {
+  if (!confirm('Deletar esta matéria?')) return;
+  try {
+    const r = await fetch(`${API}/subjects/${id}`, { method: 'DELETE' });
+    const data = await r.json();
+    if (data.success) {
+      subjects = subjects.filter(s => s._id !== id);
+      renderSubjects(); renderDashboard();
+      showToast('🗑 Matéria deletada');
+    }
+  } catch { showToast('❌ Erro ao deletar', true); }
+}
+
+// === MODALS ===
+function openModal(type) {
+  if (type === 'task') {
+    // populate subject select
+    const sel = document.getElementById('task-subject');
+    sel.innerHTML = '<option value="">Nenhuma</option>' +
+      subjects.map(s => `<option value="${s._id}">${s.name}</option>`).join('');
+    setStar(1);
+  }
+  if (type === 'subject') {
+    renderColorPicker();
+  }
+  document.getElementById('modal-' + type).classList.add('open');
+}
+
+function closeModal(type) {
+  document.getElementById('modal-' + type).classList.remove('open');
+  // reset forms
+  document.querySelectorAll(`#modal-${type} input, #modal-${type} textarea`).forEach(el => el.value = '');
+  if (type === 'task') setStar(1);
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      const type = overlay.id.replace('modal-', '');
+      closeModal(type);
+    }
+  });
+});
+
+async function saveTask() {
+  const title = document.getElementById('task-title').value.trim();
+  const dueDate = document.getElementById('task-due').value;
+  if (!title || !dueDate) return showToast('⚠️ Título e prazo são obrigatórios', true);
+
+  const body = {
+    title,
+    description: document.getElementById('task-desc').value,
+    dueDate,
+    difficulty: selectedDiff,
+    subject: document.getElementById('task-subject').value || null,
+  };
+
+  try {
+    const r = await fetch(API + '/tasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    if (data.success) {
+      tasks.unshift(data.data);
+      closeModal('task');
+      renderTasks(); renderDashboard();
+      showToast('✅ Tarefa criada!');
+    } else {
+      showToast('❌ ' + data.error, true);
+    }
+  } catch { showToast('❌ Erro ao salvar', true); }
+}
+
+async function saveEvent() {
+  const title = document.getElementById('event-title').value.trim();
+  const date = document.getElementById('event-date').value;
+  if (!title || !date) return showToast('⚠️ Título e data são obrigatórios', true);
+
+  const body = {
+    title,
+    date,
+    time: document.getElementById('event-time').value,
+    type: document.getElementById('event-type').value,
+    description: document.getElementById('event-desc').value,
+  };
+
+  try {
+    const r = await fetch(API + '/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    if (data.success) {
+      events.push(data.data);
+      closeModal('event');
+      renderEvents(); renderDashboard();
+      showToast('📅 Evento criado!');
+    }
+  } catch { showToast('❌ Erro ao salvar', true); }
+}
+
+async function saveSubject() {
+  const name = document.getElementById('subj-name').value.trim();
+  if (!name) return showToast('⚠️ Nome é obrigatório', true);
+
+  const body = {
+    name,
+    teacher: document.getElementById('subj-teacher').value,
+    schedule: document.getElementById('subj-schedule').value,
+    color: selectedColor,
+  };
+
+  try {
+    const r = await fetch(API + '/subjects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    if (data.success) {
+      subjects.push(data.data);
+      closeModal('subject');
+      renderSubjects(); renderDashboard();
+      showToast('📚 Matéria criada!');
+    }
+  } catch { showToast('❌ Erro ao salvar', true); }
+}
+
+// === STARS ===
+function setStar(n) {
+  selectedDiff = n;
+  document.querySelectorAll('.star').forEach((s, i) => {
+    s.classList.toggle('active', i < n);
+  });
+}
+
+// === COLOR PICKER ===
+function renderColorPicker() {
+  const el = document.getElementById('color-picker');
+  el.innerHTML = COLORS.map(c => `
+    <div class="color-dot ${c === selectedColor ? 'selected' : ''}"
+      style="background:${c}"
+      onclick="selectColor('${c}', this)">
+    </div>`).join('');
+}
+
+function selectColor(color, el) {
+  selectedColor = color;
+  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// === TOAST ===
+function showToast(msg, isError = false) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.borderColor = isError ? '#f8717140' : '#34d39940';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// === UTILS ===
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// === INIT ===
+(async () => {
+  await fetchAll();
+  renderDashboard();
+})();
+</script>
+</body>
+</html>
