@@ -119,3 +119,39 @@ npm run dev      # desenvolvimento com nodemon
 3. Em **Database Access**: crie um usuário com senha
 4. Em **Network Access**: adicione seu IP (ou `0.0.0.0/0` para liberar tudo)
 5. Em **Connect**: copie a connection string e cole no `.env`
+
+## 🔔 Notificações
+
+### Email (Nodemailer + Gmail)
+1. Ative "Senhas de app" na sua conta Google (myaccount.google.com → Segurança → Senhas de app)
+2. Adicione no `.env`:
+```
+EMAIL_USER=seuemail@gmail.com
+EMAIL_PASS=xxxx_xxxx_xxxx_xxxx   # Senha de app gerada pelo Google
+EMAIL_TO=destinatario@gmail.com
+```
+
+### Web Push (VAPID)
+1. Gere as chaves rodando:
+```bash
+node -e "const wp=require('web-push'); wp.generateVAPIDKeys().then(k=>console.log(k))"
+```
+2. Adicione no `.env`:
+```
+VAPID_PUBLIC_KEY=chave_publica_aqui
+VAPID_PRIVATE_KEY=chave_privada_aqui
+VAPID_EMAIL=mailto:seuemail@gmail.com
+```
+3. No app, vá em **Perfil → Notificações → Ativar Push**
+
+### Cron Jobs automáticos
+- **08:00 todo dia** — verifica tarefas vencendo em 24h e envia email + push
+- **Toda hora** — push se alguma tarefa vence em 1h
+- **Segunda às 07:00** — envia resumo semanal por email
+
+### Rotas de teste
+```
+POST /api/notifications/test-email     → testa email de alerta
+POST /api/notifications/test-weekly    → testa resumo semanal
+POST /api/notifications/test-push      → testa push notification
+```

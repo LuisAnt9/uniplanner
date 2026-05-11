@@ -9,10 +9,15 @@ const connectDB = require("./config/db");
 const taskRoutes = require("./routes/taskRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const { setupVapid } = require("./services/pushService");
+const { startCronJobs } = require("./services/cronJobs");
 
 const app = express();
 
 connectDB();
+setupVapid();
+startCronJobs();
 
 app.use(cors());
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -22,6 +27,7 @@ app.use(express.json());
 app.use("/api/tasks", taskRoutes);
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Serve frontend
 app.use(express.static(path.join(__dirname, "public")));
