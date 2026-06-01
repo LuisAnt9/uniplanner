@@ -12,7 +12,7 @@
       --bg:#0d1117; --bg2:#161b27; --bg3:#1e2538; --bg4:#252d42;
       --border:#ffffff14; --text:#e8edf5; --muted:#7b8ab0;
       --accent:#4a7cf7; --accent2:#6b9bff;
-      --green:#3ecf8e; --red:#f66; --yellow:#f5c542; --pink:#e879a0; --purple:#a78bfa;
+      --green:#3ecf8e; --red:#f66; --yellow:#f5c542;
       --radius:16px; --nav-h:68px;
     }
     body { font-family:'Nunito',sans-serif; background:#0a0d14; color:var(--text); min-height:100vh; display:flex; justify-content:center; }
@@ -48,6 +48,22 @@
     .btn-add-task { margin:20px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-size:16px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .15s; }
     .btn-add-task:hover { background:#3b6de8; }
 
+    /* LOGIN BANNER */
+    .login-banner { margin:0 20px 16px; background:#1e3a8a22; border:1px solid #4a7cf740; border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:background .15s; }
+    .login-banner:hover { background:#1e3a8a35; }
+    .login-banner-text { flex:1; font-size:13px; color:var(--muted); }
+    .login-banner-text strong { color:var(--accent2); display:block; font-size:14px; margin-bottom:2px; }
+    .login-banner-btn { background:var(--accent); color:#fff; border:none; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; white-space:nowrap; }
+
+    /* USER CHIP */
+    .user-chip { margin:0 20px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:12px 16px; display:flex; align-items:center; gap:10px; }
+    .user-chip-avatar { width:34px; height:34px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+    .user-chip-info { flex:1; }
+    .user-chip-name { font-size:14px; font-weight:700; }
+    .user-chip-email { font-size:12px; color:var(--muted); }
+    .logout-btn { background:none; border:1px solid var(--border); border-radius:8px; color:var(--muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; padding:6px 10px; cursor:pointer; }
+    .logout-btn:hover { color:var(--red); border-color:var(--red); }
+
     /* TABS */
     .tabs { display:flex; margin:0 20px 16px; background:var(--bg3); border-radius:12px; padding:4px; gap:4px; }
     .tab { flex:1; text-align:center; padding:9px; font-size:14px; font-weight:700; border-radius:9px; cursor:pointer; color:var(--muted); transition:all .15s; border:none; background:none; font-family:'Nunito',sans-serif; }
@@ -72,6 +88,12 @@
     .icon-btn:hover { opacity:1; background:var(--bg3); }
     .icon-btn.edit:hover { color:var(--accent2); }
     .icon-btn.del:hover  { color:var(--red); }
+
+    /* LOCK OVERLAY — shown over lists when not logged */
+    .lock-msg { text-align:center; padding:32px 20px; color:var(--muted); }
+    .lock-icon { font-size:36px; margin-bottom:10px; opacity:.5; }
+    .lock-text { font-size:14px; margin-bottom:16px; }
+    .lock-btn { background:var(--accent); color:#fff; border:none; border-radius:12px; padding:12px 24px; font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; }
 
     /* SUBJECTS */
     .add-subject-btn { margin:0 20px 14px; background:#1e3a8a22; border:1px dashed #4a7cf755; border-radius:var(--radius); padding:14px; color:var(--accent2); font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
@@ -121,20 +143,6 @@
     .btn-outline.danger { border-color:var(--red); color:var(--red); }
     .btn-outline.danger:hover { background:#f6666618; }
 
-    /* NOTIFICATIONS SECTION */
-    .section-title { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; padding:0 20px; margin-bottom:10px; margin-top:20px; }
-    .notif-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin:0 20px 10px; padding:16px 18px; }
-    .notif-card-title { font-size:14px; font-weight:700; margin-bottom:4px; }
-    .notif-card-desc { font-size:12px; color:var(--muted); margin-bottom:12px; }
-    .notif-status { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; display:inline-block; margin-bottom:10px; }
-    .notif-status.on  { background:#3ecf8e20; color:var(--green); }
-    .notif-status.off { background:#7b8ab020; color:var(--muted); }
-    .btn-sm { padding:9px 14px; font-size:13px; border:none; border-radius:10px; font-family:'Nunito',sans-serif; font-weight:700; cursor:pointer; transition:background .15s; }
-    .btn-accent { background:var(--accent); color:#fff; }
-    .btn-accent:hover { background:#3b6de8; }
-    .btn-secondary { background:var(--bg3); color:var(--text); }
-    .btn-secondary:hover { background:var(--bg4); }
-
     /* BOTTOM NAV */
     .bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; height:var(--nav-h); background:var(--bg2); border-top:1px solid var(--border); display:flex; align-items:flex-start; justify-content:space-around; padding-top:10px; z-index:100; }
     .nav-btn { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:4px 14px; border-radius:12px; border:none; background:none; color:var(--muted); font-family:'Nunito',sans-serif; transition:color .15s; }
@@ -163,13 +171,32 @@
     .color-opt { width:30px; height:30px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:transform .1s; }
     .color-opt.sel { border-color:#fff; transform:scale(1.2); }
 
+    /* AUTH MODAL */
+    .auth-tabs { display:flex; background:var(--bg3); border-radius:12px; padding:4px; gap:4px; margin-bottom:20px; }
+    .auth-tab { flex:1; text-align:center; padding:9px; font-size:14px; font-weight:700; border-radius:9px; cursor:pointer; color:var(--muted); border:none; background:none; font-family:'Nunito',sans-serif; transition:all .15s; }
+    .auth-tab.active { background:var(--accent); color:#fff; }
+    .auth-form { display:none; }
+    .auth-form.active { display:block; }
+    .auth-divider { text-align:center; color:var(--muted); font-size:12px; margin:12px 0; }
+    .error-msg { background:#f6666618; border:1px solid #f6666630; border-radius:10px; padding:10px 14px; font-size:13px; color:var(--red); margin-bottom:14px; display:none; }
+    .error-msg.show { display:block; }
+
     /* EMPTY / TOAST */
     .empty { text-align:center; padding:40px 20px; color:var(--muted); }
     .empty-icon { font-size:40px; margin-bottom:10px; opacity:.35; }
     .toast { position:fixed; bottom:calc(var(--nav-h) + 14px); left:50%; transform:translateX(-50%); background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:12px 22px; font-size:14px; font-weight:600; z-index:9999; white-space:nowrap; animation:toastPop .2s ease; }
     @keyframes toastPop { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%)} }
 
-    .divider-row { height:1px; background:var(--border); margin:4px 0; }
+    .section-title { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; padding:0 20px; margin-bottom:10px; margin-top:20px; }
+    .notif-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin:0 20px 10px; padding:16px 18px; }
+    .notif-card-title { font-size:14px; font-weight:700; margin-bottom:4px; }
+    .notif-card-desc { font-size:12px; color:var(--muted); margin-bottom:12px; }
+    .notif-status { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; display:inline-block; margin-bottom:10px; }
+    .notif-status.on  { background:#3ecf8e20; color:var(--green); }
+    .notif-status.off { background:#7b8ab020; color:var(--muted); }
+    .btn-sm { padding:9px 14px; font-size:13px; border:none; border-radius:10px; font-family:'Nunito',sans-serif; font-weight:700; cursor:pointer; transition:background .15s; }
+    .btn-accent { background:var(--accent); color:#fff; }
+    .btn-secondary { background:var(--bg3); color:var(--text); }
   </style>
 </head>
 <body>
@@ -180,14 +207,34 @@
     <div class="topbar">
       <div class="topbar-logo">Uni<span>-Planner</span></div>
       <div class="topbar-icons">
-        <div class="topbar-icon" onclick="goTo('profile')" title="Notificações">🔔</div>
-        <div class="topbar-icon" onclick="goTo('profile')">☰</div>
+        <div class="topbar-icon">🔔</div>
       </div>
     </div>
     <div class="greeting">
       <div class="greeting-name" id="home-greeting">Olá! 👋</div>
       <div class="greeting-date" id="home-date"></div>
     </div>
+
+    <!-- Mostra se NÃO logado -->
+    <div id="login-banner" class="login-banner" onclick="openAuthModal()">
+      <span style="font-size:24px">🔐</span>
+      <div class="login-banner-text">
+        <strong>Entre para salvar seus dados</strong>
+        Sem conta, nada é salvo no servidor
+      </div>
+      <button class="login-banner-btn">Entrar</button>
+    </div>
+
+    <!-- Mostra se logado -->
+    <div id="user-chip" class="user-chip" style="display:none">
+      <div class="user-chip-avatar">👤</div>
+      <div class="user-chip-info">
+        <div class="user-chip-name" id="chip-name">—</div>
+        <div class="user-chip-email" id="chip-email">—</div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Sair</button>
+    </div>
+
     <div class="home-cards">
       <div class="home-card" onclick="goTo('subjects')">
         <div class="home-card-icon" style="background:#162d6e">📘</div>
@@ -204,7 +251,7 @@
         </div>
       </div>
     </div>
-    <button class="btn-add-task" onclick="openTaskModal()">＋ Adicionar Tarefa</button>
+    <button class="btn-add-task" onclick="requireLogin(openTaskModal)">＋ Adicionar Tarefa</button>
   </div>
 
   <!-- TAREFAS -->
@@ -212,7 +259,7 @@
     <div class="screen-header">
       <button class="back-btn" onclick="goTo('home')">‹</button>
       <div class="screen-title">📋 Tarefas</div>
-      <button class="header-action" onclick="openTaskModal()">＋</button>
+      <button class="header-action" onclick="requireLogin(openTaskModal)">＋</button>
     </div>
     <div class="tabs">
       <button class="tab active" id="tab-pending" onclick="switchTab('pending')">Pendentes</button>
@@ -220,7 +267,7 @@
     </div>
     <div class="quick-add">
       <input id="quick-input" class="form-input" placeholder="Adicionar nova tarefa..."/>
-      <button onclick="quickAdd()">Adicionar</button>
+      <button onclick="requireLogin(quickAdd)">Adicionar</button>
     </div>
     <div id="task-list"></div>
   </div>
@@ -230,9 +277,9 @@
     <div class="screen-header">
       <button class="back-btn" onclick="goTo('home')">‹</button>
       <div class="screen-title">📚 Matérias</div>
-      <button class="header-action" onclick="openSubjectModal()">＋</button>
+      <button class="header-action" onclick="requireLogin(openSubjectModal)">＋</button>
     </div>
-    <button class="add-subject-btn" onclick="openSubjectModal()">＋ Adicionar Matéria</button>
+    <button class="add-subject-btn" onclick="requireLogin(openSubjectModal)">＋ Adicionar Matéria</button>
     <div id="subject-list"></div>
   </div>
 
@@ -241,7 +288,7 @@
     <div class="screen-header">
       <button class="back-btn" onclick="goTo('home')">‹</button>
       <div class="screen-title">📅 Calendário</div>
-      <button class="header-action" onclick="openEventModal()">＋</button>
+      <button class="header-action" onclick="requireLogin(openEventModal)">＋</button>
     </div>
     <div class="calendar-wrap">
       <div class="cal-nav">
@@ -257,7 +304,7 @@
     </div>
   </div>
 
-  <!-- PERFIL + NOTIFICAÇÕES -->
+  <!-- PERFIL -->
   <div class="screen" id="screen-profile">
     <div class="screen-header">
       <button class="back-btn" onclick="goTo('home')">‹</button>
@@ -267,6 +314,10 @@
       <div class="avatar">👩‍🎓</div>
       <div class="profile-name" id="profile-name-display">Estudante</div>
       <div class="profile-info">
+        <div class="profile-row">
+          <span class="profile-row-label">Email</span>
+          <span class="profile-row-value" id="profile-email-display">—</span>
+        </div>
         <div class="profile-row">
           <span class="profile-row-label">Curso</span>
           <span class="profile-row-value" id="profile-curso-display">—</span>
@@ -278,36 +329,35 @@
         <div class="profile-row">
           <span class="profile-row-label">Tema</span>
           <span class="profile-row-value">Escuro</span>
-          <div class="toggle" id="theme-toggle" onclick="this.classList.toggle('off')"></div>
+          <div class="toggle" onclick="this.classList.toggle('off')"></div>
         </div>
       </div>
-      <button class="btn-outline" onclick="openProfileModal()">✏️ Editar Perfil</button>
-      <button class="btn-outline danger" onclick="resetData()">🔄 Resetar Dados</button>
-    </div>
-
-    <!-- NOTIFICAÇÕES -->
-    <div class="section-title">🔔 Notificações</div>
-
-    <div class="notif-card">
-      <div class="notif-card-title">📧 Email — Alertas de Prazo</div>
-      <div class="notif-card-desc">Receba um email quando uma tarefa estiver vencendo nas próximas 24h e um resumo toda segunda-feira.</div>
-      <div class="notif-status off" id="email-status">Não configurado</div>
-      <br/>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn-sm btn-accent" onclick="openEmailModal()">⚙️ Configurar</button>
-        <button class="btn-sm btn-secondary" onclick="testEmail()">🧪 Testar Email</button>
-        <button class="btn-sm btn-secondary" onclick="testWeekly()">📋 Testar Resumo</button>
+      <div id="profile-logged-actions" style="width:100%;display:none">
+        <button class="btn-outline" onclick="openProfileModal()">✏️ Editar Perfil</button>
+        <button class="btn-outline danger" onclick="logout()">🚪 Sair da Conta</button>
       </div>
-    </div>
+      <div id="profile-guest-actions" style="width:100%">
+        <button class="btn-outline" onclick="openAuthModal()">🔐 Entrar / Criar Conta</button>
+      </div>
 
-    <div class="notif-card">
-      <div class="notif-card-title">🔔 Push — Notificações no Navegador</div>
-      <div class="notif-card-desc">Receba alertas no celular/navegador quando o prazo de uma tarefa estiver chegando.</div>
-      <div class="notif-status off" id="push-status">Não ativado</div>
-      <br/>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn-sm btn-accent" onclick="enablePush()">🔔 Ativar Push</button>
-        <button class="btn-sm btn-secondary" onclick="testPush()">🧪 Testar Push</button>
+      <div class="section-title" style="width:100%;padding:0;margin-top:20px">🔔 Notificações</div>
+      <div class="notif-card" style="margin:10px 0 10px;width:100%">
+        <div class="notif-card-title">📧 Email — Alertas de Prazo</div>
+        <div class="notif-card-desc">Alertas de vencimento e resumo semanal toda segunda.</div>
+        <div class="notif-status off" id="email-status">Não configurado</div><br/>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-sm btn-accent" onclick="openEmailModal()">⚙️ Configurar</button>
+          <button class="btn-sm btn-secondary" onclick="testEmail()">🧪 Testar</button>
+        </div>
+      </div>
+      <div class="notif-card" style="margin:0 0 10px;width:100%">
+        <div class="notif-card-title">🔔 Push — Notificações</div>
+        <div class="notif-card-desc">Alertas no celular quando o prazo chegar.</div>
+        <div class="notif-status off" id="push-status">Não ativado</div><br/>
+        <div style="display:flex;gap:8px">
+          <button class="btn-sm btn-accent" onclick="enablePush()">🔔 Ativar</button>
+          <button class="btn-sm btn-secondary" onclick="testPush()">🧪 Testar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -332,7 +382,67 @@
   </nav>
 </div>
 
-<!-- MODAL TASK (CREATE / EDIT) -->
+<!-- MODAL AUTH (LOGIN / CADASTRO) -->
+<div class="modal-overlay" id="modal-auth">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🎓 UniPlanner</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="auth-tab-login" onclick="switchAuthTab('login')">Entrar</button>
+      <button class="auth-tab" id="auth-tab-register" onclick="switchAuthTab('register')">Criar Conta</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="auth-form active" id="auth-login">
+      <div class="error-msg" id="login-error"></div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input id="login-email" class="form-input" type="email" placeholder="seuemail@gmail.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input id="login-pass" class="form-input" type="password" placeholder="Sua senha"/>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('auth')">Cancelar</button>
+        <button class="btn-save" onclick="doLogin()">Entrar</button>
+      </div>
+    </div>
+
+    <!-- CADASTRO -->
+    <div class="auth-form" id="auth-register">
+      <div class="error-msg" id="register-error"></div>
+      <div class="form-group">
+        <label class="form-label">Nome *</label>
+        <input id="reg-name" class="form-input" placeholder="Seu nome"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input id="reg-email" class="form-input" type="email" placeholder="seuemail@gmail.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha * (mínimo 6 caracteres)</label>
+        <input id="reg-pass" class="form-input" type="password" placeholder="Crie uma senha"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Curso</label>
+          <input id="reg-curso" class="form-input" placeholder="Ex: Eng. Software"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Período</label>
+          <input id="reg-periodo" class="form-input" placeholder="Ex: 5º Sem."/>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('auth')">Cancelar</button>
+        <button class="btn-save" onclick="doRegister()">Criar Conta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TASK -->
 <div class="modal-overlay" id="modal-task">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -432,10 +542,6 @@
         <option value="outro">📌 Outro</option>
       </select>
     </div>
-    <div class="form-group">
-      <label class="form-label">Descrição</label>
-      <input id="e-desc" class="form-input" placeholder="Detalhes opcionais..."/>
-    </div>
     <input type="hidden" id="e-editing-id"/>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('event')">Cancelar</button>
@@ -444,8 +550,8 @@
   </div>
 </div>
 
-<!-- MODAL PROFILE -->
-<div class="modal-overlay" id="modal-profile">
+<!-- MODAL PROFILE EDIT -->
+<div class="modal-overlay" id="modal-profile-edit">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">✏️ Editar Perfil</div>
@@ -462,18 +568,17 @@
       <input id="p-periodo" class="form-input" placeholder="Ex: 5º Semestre"/>
     </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('profile')">Cancelar</button>
+      <button class="btn-cancel" onclick="closeModal('profile-edit')">Cancelar</button>
       <button class="btn-save" onclick="saveProfile()">Salvar</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL EMAIL CONFIG -->
+<!-- MODAL EMAIL -->
 <div class="modal-overlay" id="modal-email">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">📧 Configurar Email</div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Digite seu email para receber alertas de prazo e o resumo semanal toda segunda-feira.</p>
     <div class="form-group">
       <label class="form-label">Seu Email *</label>
       <input id="email-addr" class="form-input" type="email" placeholder="voce@gmail.com"/>
@@ -488,115 +593,227 @@
 <script>
 const API = '/api';
 let tasks=[], subjects=[], events=[];
+let currentUser = null;
+let token = localStorage.getItem('up_token') || null;
 let currentTab = 'pending';
 let calYear, calMonth, selDay;
 let selColor = '#4a7cf7';
-let profile = { name:'Estudante', curso:'', periodo:'' };
+let pendingAction = null; // função a executar após login
+
 const COLORS = ['#4a7cf7','#3ecf8e','#e879a0','#a78bfa','#f5c542','#f97316','#06b6d4','#ef4444','#84cc16'];
 const TYPE_ICONS = { prova:'📝', trabalho:'📘', 'reunião':'🤝', outro:'📌' };
 const TYPE_BG    = { prova:'#3b1515', trabalho:'#162d6e', 'reunião':'#2d1b5a', outro:'#1e2538' };
 
 // ═══ INIT ═══
 async function init() {
-  const p = localStorage.getItem('up_profile'); if (p) profile = JSON.parse(p);
   const now = new Date();
-  calYear = now.getFullYear(); calMonth = now.getMonth(); selDay = now.getDate();
-  try {
-    const [t,s,e] = await Promise.all([
-      fetch(API+'/tasks').then(r=>r.json()),
-      fetch(API+'/subjects').then(r=>r.json()),
-      fetch(API+'/events').then(r=>r.json()),
-    ]);
-    tasks=t.data||[]; subjects=s.data||[]; events=e.data||[];
-  } catch {
-    tasks    = JSON.parse(localStorage.getItem('up_tasks')    || '[]');
-    subjects = JSON.parse(localStorage.getItem('up_subjects') || '[]');
-    events   = JSON.parse(localStorage.getItem('up_events')   || '[]');
-  }
-  renderAll();
-  initPushStatus();
-  initEmailStatus();
+  calYear=now.getFullYear(); calMonth=now.getMonth(); selDay=now.getDate();
+
+  if (token) await restoreSession();
+  else renderGuest();
+
+  renderHome();
 }
 
-function renderAll() { renderHome(); renderTasks(); renderSubjects(); renderProfile(); }
+async function restoreSession() {
+  try {
+    const r = await apiGet('/auth/me');
+    if (r.success) {
+      currentUser = r.user;
+      await fetchUserData();
+      renderLoggedIn();
+    } else {
+      token = null; localStorage.removeItem('up_token');
+      renderGuest();
+    }
+  } catch {
+    token = null; localStorage.removeItem('up_token');
+    renderGuest();
+  }
+}
+
+async function fetchUserData() {
+  try {
+    const [t,s,e] = await Promise.all([
+      apiGet('/tasks'), apiGet('/subjects'), apiGet('/events'),
+    ]);
+    tasks    = t.data || [];
+    subjects = s.data || [];
+    events   = e.data || [];
+  } catch { tasks=[]; subjects=[]; events=[]; }
+}
+
+function renderGuest() {
+  document.getElementById('login-banner').style.display = 'flex';
+  document.getElementById('user-chip').style.display    = 'none';
+  document.getElementById('profile-logged-actions').style.display = 'none';
+  document.getElementById('profile-guest-actions').style.display  = 'block';
+  tasks=[]; subjects=[]; events=[];
+  renderTasks(); renderSubjects(); renderProfile();
+}
+
+function renderLoggedIn() {
+  document.getElementById('login-banner').style.display = 'none';
+  document.getElementById('user-chip').style.display    = 'flex';
+  document.getElementById('chip-name').textContent  = currentUser.name;
+  document.getElementById('chip-email').textContent = currentUser.email;
+  document.getElementById('profile-logged-actions').style.display = 'block';
+  document.getElementById('profile-guest-actions').style.display  = 'none';
+  renderTasks(); renderSubjects(); renderProfile();
+  renderHome();
+}
+
+// ═══ requireLogin — chave do fluxo ═══
+function requireLogin(action) {
+  if (currentUser) { action(); return; }
+  pendingAction = action;
+  openAuthModal();
+}
 
 // ═══ NAVIGATION ═══
 function goTo(screen) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('screen-'+screen).classList.add('active');
-  const nb = document.getElementById('nav-'+screen); if (nb) nb.classList.add('active');
-  if (screen==='calendar') renderCalendar();
+  const nb=document.getElementById('nav-'+screen); if(nb) nb.classList.add('active');
+  if(screen==='calendar') renderCalendar();
 }
 
 // ═══ HOME ═══
 function renderHome() {
-  const now = new Date();
-  const DAYS  = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
-  const MONTHS= ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  document.getElementById('home-greeting').textContent = `Olá, ${profile.name} 👋`;
-  document.getElementById('home-date').textContent     = `${DAYS[now.getDay()]}, ${now.getDate()} de ${MONTHS[now.getMonth()]}`;
-  const DOW = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const nxt = subjects.find(s => s.schedule && s.schedule.includes(DOW[now.getDay()]));
-  document.getElementById('home-next-class').textContent = nxt ? `${nxt.name} - ${nxt.schedule}` : 'Nenhuma aula hoje';
-  const pend = tasks.filter(t=>!t.completed).length;
-  document.getElementById('home-pending-count').textContent = pend===0 ? 'Nenhuma tarefa pendente 🎉' : `${pend} tarefa${pend>1?'s':''} para hoje`;
+  const now=new Date();
+  const DAYS=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const name = currentUser ? currentUser.name : 'Visitante';
+  document.getElementById('home-greeting').textContent=`Olá, ${name} 👋`;
+  document.getElementById('home-date').textContent=`${DAYS[now.getDay()]}, ${now.getDate()} de ${MONTHS[now.getMonth()]}`;
+  const DOW=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const nxt=subjects.find(s=>s.schedule&&s.schedule.includes(DOW[now.getDay()]));
+  document.getElementById('home-next-class').textContent=nxt?`${nxt.name} - ${nxt.schedule}`:'Nenhuma aula hoje';
+  const pend=tasks.filter(t=>!t.completed).length;
+  document.getElementById('home-pending-count').textContent=pend===0?'Nenhuma tarefa pendente 🎉':`${pend} tarefa${pend>1?'s':''} pendentes`;
+}
+
+// ═══ AUTH ═══
+function openAuthModal(tab) {
+  switchAuthTab(tab||'login');
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('register-error').classList.remove('show');
+  document.getElementById('modal-auth').classList.add('open');
+}
+
+function switchAuthTab(tab) {
+  document.getElementById('auth-tab-login').classList.toggle('active',tab==='login');
+  document.getElementById('auth-tab-register').classList.toggle('active',tab==='register');
+  document.getElementById('auth-login').classList.toggle('active',tab==='login');
+  document.getElementById('auth-register').classList.toggle('active',tab==='register');
+}
+
+async function doLogin() {
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-error');
+  errEl.classList.remove('show');
+  if(!email||!pass){ errEl.textContent='Preencha email e senha'; errEl.classList.add('show'); return; }
+  try {
+    const r=await apiPost('/auth/login',{email,password:pass});
+    if(!r.success){ errEl.textContent=r.error||'Erro ao entrar'; errEl.classList.add('show'); return; }
+    token=r.token; currentUser=r.user;
+    localStorage.setItem('up_token',token);
+    await fetchUserData();
+    closeModal('auth');
+    renderLoggedIn();
+    toast(`👋 Bem-vindo, ${currentUser.name}!`);
+    if(pendingAction){ pendingAction(); pendingAction=null; }
+  } catch { errEl.textContent='Erro de conexão'; errEl.classList.add('show'); }
+}
+
+async function doRegister() {
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const pass=document.getElementById('reg-pass').value;
+  const curso=document.getElementById('reg-curso').value.trim();
+  const periodo=document.getElementById('reg-periodo').value.trim();
+  const errEl=document.getElementById('register-error');
+  errEl.classList.remove('show');
+  if(!name||!email||!pass){ errEl.textContent='Nome, email e senha são obrigatórios'; errEl.classList.add('show'); return; }
+  if(pass.length<6){ errEl.textContent='Senha deve ter pelo menos 6 caracteres'; errEl.classList.add('show'); return; }
+  try {
+    const r=await apiPost('/auth/register',{name,email,password:pass,curso,periodo});
+    if(!r.success){ errEl.textContent=r.error||'Erro ao criar conta'; errEl.classList.add('show'); return; }
+    token=r.token; currentUser=r.user;
+    localStorage.setItem('up_token',token);
+    tasks=[]; subjects=[]; events=[];
+    closeModal('auth');
+    renderLoggedIn();
+    toast(`🎉 Conta criada! Bem-vindo, ${currentUser.name}!`);
+    if(pendingAction){ pendingAction(); pendingAction=null; }
+  } catch { errEl.textContent='Erro de conexão'; errEl.classList.add('show'); }
+}
+
+function logout() {
+  if(!confirm('Sair da conta?')) return;
+  token=null; currentUser=null;
+  localStorage.removeItem('up_token');
+  renderGuest(); renderHome();
+  toast('👋 Até logo!');
 }
 
 // ═══ TASKS ═══
 function switchTab(tab) {
   currentTab=tab;
-  document.getElementById('tab-pending').classList.toggle('active', tab==='pending');
-  document.getElementById('tab-done').classList.toggle('active', tab==='done');
+  document.getElementById('tab-pending').classList.toggle('active',tab==='pending');
+  document.getElementById('tab-done').classList.toggle('active',tab==='done');
   renderTasks();
 }
 
 function renderTasks() {
-  const list = document.getElementById('task-list');
-  const items = tasks.filter(t => currentTab==='pending' ? !t.completed : t.completed);
-  if (!items.length) {
-    list.innerHTML = `<div class="empty"><div class="empty-icon">${currentTab==='pending'?'🎉':'📋'}</div><div>${currentTab==='pending'?'Nenhuma tarefa pendente!':'Nenhuma concluída ainda.'}</div></div>`;
+  const list=document.getElementById('task-list');
+  if(!currentUser){
+    list.innerHTML=`<div class="lock-msg"><div class="lock-icon">🔐</div><div class="lock-text">Entre para ver suas tarefas</div><button class="lock-btn" onclick="openAuthModal()">Entrar</button></div>`;
     return;
   }
-  list.innerHTML = items.map(t => {
-    const subj = subjects.find(s=>gid(s)===(t.subject?._id||t.subject));
-    const due  = t.dueDate ? new Date(t.dueDate).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) : '';
-    return `
-    <div class="task-item">
+  const items=tasks.filter(t=>currentTab==='pending'?!t.completed:t.completed);
+  if(!items.length){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">${currentTab==='pending'?'🎉':'📋'}</div><div>${currentTab==='pending'?'Nenhuma tarefa pendente!':'Nenhuma concluída ainda.'}</div></div>`;
+    return;
+  }
+  list.innerHTML=items.map(t=>{
+    const subj=subjects.find(s=>gid(s)===(t.subject?._id||t.subject));
+    const due=t.dueDate?new Date(t.dueDate).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'';
+    return `<div class="task-item">
       <div class="task-checkbox ${t.completed?'checked':''}" onclick="toggleTask('${gid(t)}',${t.completed})">✓</div>
-      <div class="task-text-wrap" style="flex:1;min-width:0">
+      <div style="flex:1;min-width:0">
         <div class="task-text ${t.completed?'done':''}">${esc(t.title)}</div>
         <div class="task-meta">${due?`📅 ${due}`:''}${subj?` · ${esc(subj.name)}`:''}</div>
       </div>
       <div class="item-actions">
-        ${!t.completed?`<button class="icon-btn edit" onclick="editTask('${gid(t)}')" title="Editar">✏️</button>`:''}
-        <button class="icon-btn del" onclick="deleteTask('${gid(t)}')" title="Deletar">🗑</button>
+        ${!t.completed?`<button class="icon-btn edit" onclick="editTask('${gid(t)}')">✏️</button>`:''}
+        <button class="icon-btn del" onclick="deleteTask('${gid(t)}')">🗑</button>
       </div>
-    </div>`; }).join('');
+    </div>`;}).join('');
 }
 
 async function quickAdd() {
-  const inp = document.getElementById('quick-input');
-  const title = inp.value.trim(); if (!title) return;
-  inp.value = '';
-  await doAddTask({ title, dueDate: new Date().toISOString(), difficulty:1 });
+  const inp=document.getElementById('quick-input');
+  const title=inp.value.trim(); if(!title) return;
+  inp.value='';
+  await doAddTask({title,dueDate:new Date().toISOString(),difficulty:1});
 }
 
 function openTaskModal(editId) {
-  document.getElementById('t-subject').innerHTML =
-    '<option value="">Nenhuma</option>' + subjects.map(s=>`<option value="${gid(s)}">${esc(s.name)}</option>`).join('');
-  document.getElementById('t-editing-id').value = '';
-  document.getElementById('task-modal-title').textContent = '✅ Nova Tarefa';
-  if (editId) {
-    const t = tasks.find(x=>gid(x)===editId);
-    if (!t) return;
-    document.getElementById('t-editing-id').value = editId;
-    document.getElementById('task-modal-title').textContent = '✏️ Editar Tarefa';
-    document.getElementById('t-title').value = t.title || '';
-    document.getElementById('t-desc').value  = t.description || '';
-    document.getElementById('t-difficulty').value = t.difficulty || 1;
-    document.getElementById('t-subject').value = t.subject?._id || t.subject || '';
-    if (t.dueDate) document.getElementById('t-due').value = new Date(t.dueDate).toISOString().slice(0,16);
+  document.getElementById('t-subject').innerHTML='<option value="">Nenhuma</option>'+subjects.map(s=>`<option value="${gid(s)}">${esc(s.name)}</option>`).join('');
+  document.getElementById('t-editing-id').value='';
+  document.getElementById('task-modal-title').textContent='✅ Nova Tarefa';
+  if(editId&&typeof editId==='string'){
+    const t=tasks.find(x=>gid(x)===editId); if(!t) return;
+    document.getElementById('t-editing-id').value=editId;
+    document.getElementById('task-modal-title').textContent='✏️ Editar Tarefa';
+    document.getElementById('t-title').value=t.title||'';
+    document.getElementById('t-desc').value=t.description||'';
+    document.getElementById('t-difficulty').value=t.difficulty||1;
+    document.getElementById('t-subject').value=t.subject?._id||t.subject||'';
+    if(t.dueDate) document.getElementById('t-due').value=new Date(t.dueDate).toISOString().slice(0,16);
   } else {
     ['t-title','t-desc'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('t-difficulty').value='1';
@@ -605,65 +822,51 @@ function openTaskModal(editId) {
   document.getElementById('modal-task').classList.add('open');
 }
 
-function editTask(id) { openTaskModal(id); }
+function editTask(id){ requireLogin(()=>openTaskModal(id)); }
 
 async function saveTask() {
-  const title = document.getElementById('t-title').value.trim();
-  if (!title) return toast('⚠️ Título obrigatório');
-  const editId = document.getElementById('t-editing-id').value;
-  const body = {
-    title,
-    description: document.getElementById('t-desc').value,
-    dueDate: document.getElementById('t-due').value || new Date().toISOString(),
-    subject:  document.getElementById('t-subject').value || null,
-    difficulty: parseInt(document.getElementById('t-difficulty').value) || 1,
-  };
-  if (editId) {
-    await doUpdateTask(editId, body);
-  } else {
-    await doAddTask(body);
-  }
+  const title=document.getElementById('t-title').value.trim();
+  if(!title) return toast('⚠️ Título obrigatório');
+  const editId=document.getElementById('t-editing-id').value;
+  const body={title,description:document.getElementById('t-desc').value,dueDate:document.getElementById('t-due').value||new Date().toISOString(),subject:document.getElementById('t-subject').value||null,difficulty:parseInt(document.getElementById('t-difficulty').value)||1};
+  if(editId){ await doUpdateTask(editId,body); } else { await doAddTask(body); }
   closeModal('task');
 }
 
 async function doAddTask(body) {
-  try {
-    const r = await fetch(API+'/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const d = await r.json(); if(d.success) tasks.unshift(d.data); else throw 0;
-  } catch { tasks.unshift({_id:Date.now().toString(),...body,completed:false}); save(); }
+  const r=await apiPost('/tasks',body);
+  if(r.success) tasks.unshift(r.data);
   renderTasks(); renderHome(); toast('✅ Tarefa adicionada!');
 }
 
-async function doUpdateTask(id, body) {
-  try {
-    const r = await fetch(`${API}/tasks/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const d = await r.json();
-    if(d.success){ const i=tasks.findIndex(t=>gid(t)===id); if(i>-1) tasks[i]=d.data; }
-    else throw 0;
-  } catch { const i=tasks.findIndex(t=>gid(t)===id); if(i>-1) Object.assign(tasks[i],body); save(); }
+async function doUpdateTask(id,body) {
+  const r=await apiPut(`/tasks/${id}`,body);
+  if(r.success){const i=tasks.findIndex(t=>gid(t)===id);if(i>-1)tasks[i]=r.data;}
   renderTasks(); renderHome(); toast('✏️ Tarefa atualizada!');
 }
 
-async function toggleTask(id, done) {
-  if (done) return;
-  try {
-    const r = await fetch(`${API}/tasks/${id}/complete`,{method:'PUT'});
-    const d = await r.json(); if(d.success){const i=tasks.findIndex(t=>gid(t)===id);if(i>-1)tasks[i]=d.data;}else throw 0;
-  } catch { const i=tasks.findIndex(t=>gid(t)===id); if(i>-1) tasks[i].completed=true; save(); }
-  renderTasks(); renderHome(); toast('✅ Tarefa concluída!');
+async function toggleTask(id,done) {
+  if(done) return;
+  const r=await apiPut(`/tasks/${id}/complete`,{});
+  if(r.success){const i=tasks.findIndex(t=>gid(t)===id);if(i>-1)tasks[i]=r.data;}
+  renderTasks(); renderHome(); toast('✅ Concluída!');
 }
 
 async function deleteTask(id) {
-  try { await fetch(`${API}/tasks/${id}`,{method:'DELETE'}); } catch {}
-  tasks=tasks.filter(t=>gid(t)!==id); save();
-  renderTasks(); renderHome(); toast('🗑 Tarefa removida');
+  await apiDelete(`/tasks/${id}`);
+  tasks=tasks.filter(t=>gid(t)!==id);
+  renderTasks(); renderHome(); toast('🗑 Removida');
 }
 
 // ═══ SUBJECTS ═══
 function renderSubjects() {
-  const el = document.getElementById('subject-list');
-  if (!subjects.length) { el.innerHTML='<div class="empty"><div class="empty-icon">📚</div><div>Nenhuma matéria ainda.</div></div>'; return; }
-  el.innerHTML = subjects.map(s=>`
+  const el=document.getElementById('subject-list');
+  if(!currentUser){
+    el.innerHTML=`<div class="lock-msg"><div class="lock-icon">🔐</div><div class="lock-text">Entre para ver suas matérias</div><button class="lock-btn" onclick="openAuthModal()">Entrar</button></div>`;
+    return;
+  }
+  if(!subjects.length){el.innerHTML='<div class="empty"><div class="empty-icon">📚</div><div>Nenhuma matéria ainda.</div></div>';return;}
+  el.innerHTML=subjects.map(s=>`
     <div class="subject-card" style="background:${s.color}28;border:1px solid ${s.color}45">
       <div class="subject-dot" style="background:${s.color}"></div>
       <div class="subject-info">
@@ -671,66 +874,60 @@ function renderSubjects() {
         <div class="subject-meta">${s.teacher?`Prof. ${esc(s.teacher)}`:''}${s.teacher&&s.schedule?' - ':''}${esc(s.schedule||'')}</div>
       </div>
       <div class="item-actions">
-        <button class="icon-btn edit" onclick="editSubject('${gid(s)}')">✏️</button>
+        <button class="icon-btn edit" onclick="requireLogin(()=>editSubject('${gid(s)}'))">✏️</button>
         <button class="icon-btn del"  onclick="deleteSubject('${gid(s)}')">🗑</button>
       </div>
     </div>`).join('');
 }
 
 function openSubjectModal(editId) {
-  selColor = '#4a7cf7';
-  document.getElementById('s-editing-id').value = '';
-  document.getElementById('subj-modal-title').textContent = '📚 Nova Matéria';
-  if (editId) {
-    const s = subjects.find(x=>gid(x)===editId); if (!s) return;
-    document.getElementById('s-editing-id').value = editId;
-    document.getElementById('subj-modal-title').textContent = '✏️ Editar Matéria';
-    document.getElementById('s-name').value     = s.name     || '';
-    document.getElementById('s-teacher').value  = s.teacher  || '';
-    document.getElementById('s-schedule').value = s.schedule || '';
-    selColor = s.color || '#4a7cf7';
+  selColor='#4a7cf7';
+  document.getElementById('s-editing-id').value='';
+  document.getElementById('subj-modal-title').textContent='📚 Nova Matéria';
+  if(editId&&typeof editId==='string'){
+    const s=subjects.find(x=>gid(x)===editId); if(!s) return;
+    document.getElementById('s-editing-id').value=editId;
+    document.getElementById('subj-modal-title').textContent='✏️ Editar Matéria';
+    document.getElementById('s-name').value=s.name||'';
+    document.getElementById('s-teacher').value=s.teacher||'';
+    document.getElementById('s-schedule').value=s.schedule||'';
+    selColor=s.color||'#4a7cf7';
   } else {
     ['s-name','s-teacher','s-schedule'].forEach(id=>document.getElementById(id).value='');
   }
-  document.getElementById('color-row').innerHTML = COLORS.map(c=>
-    `<div class="color-opt${c===selColor?' sel':''}" style="background:${c}" onclick="pickColor('${c}',this)"></div>`).join('');
+  document.getElementById('color-row').innerHTML=COLORS.map(c=>`<div class="color-opt${c===selColor?' sel':''}" style="background:${c}" onclick="pickColor('${c}',this)"></div>`).join('');
   document.getElementById('modal-subject').classList.add('open');
 }
 
-function editSubject(id) { openSubjectModal(id); }
+function editSubject(id){openSubjectModal(id);}
 
 async function saveSubject() {
-  const name = document.getElementById('s-name').value.trim(); if (!name) return toast('⚠️ Nome obrigatório');
-  const editId = document.getElementById('s-editing-id').value;
-  const body = { name, teacher:document.getElementById('s-teacher').value, schedule:document.getElementById('s-schedule').value, color:selColor };
-  if (editId) {
-    try {
-      const r=await fetch(`${API}/subjects/${editId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      const d=await r.json(); if(d.success){const i=subjects.findIndex(s=>gid(s)===editId);if(i>-1)subjects[i]=d.data;}else throw 0;
-    } catch { const i=subjects.findIndex(s=>gid(s)===editId); if(i>-1) Object.assign(subjects[i],body); save(); }
+  const name=document.getElementById('s-name').value.trim(); if(!name) return toast('⚠️ Nome obrigatório');
+  const editId=document.getElementById('s-editing-id').value;
+  const body={name,teacher:document.getElementById('s-teacher').value,schedule:document.getElementById('s-schedule').value,color:selColor};
+  if(editId){
+    const r=await apiPut(`/subjects/${editId}`,body);
+    if(r.success){const i=subjects.findIndex(s=>gid(s)===editId);if(i>-1)subjects[i]=r.data;}
     toast('✏️ Matéria atualizada!');
   } else {
-    try {
-      const r=await fetch(API+'/subjects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      const d=await r.json(); if(d.success) subjects.push(d.data); else throw 0;
-    } catch { subjects.push({_id:Date.now().toString(),...body}); save(); }
+    const r=await apiPost('/subjects',body);
+    if(r.success) subjects.push(r.data);
     toast('📚 Matéria adicionada!');
   }
-  closeModal('subject');
-  renderSubjects(); renderHome();
+  closeModal('subject'); renderSubjects(); renderHome();
 }
 
 async function deleteSubject(id) {
-  try { await fetch(`${API}/subjects/${id}`,{method:'DELETE'}); } catch {}
-  subjects=subjects.filter(s=>gid(s)!==id); save();
-  renderSubjects(); toast('🗑 Matéria removida');
+  await apiDelete(`/subjects/${id}`);
+  subjects=subjects.filter(s=>gid(s)!==id);
+  renderSubjects(); toast('🗑 Removida');
 }
 
 // ═══ CALENDAR ═══
 function renderCalendar() {
   const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   document.getElementById('cal-month-label').textContent=`${MONTHS[calMonth]} ${calYear}`;
-  const first=new Date(calYear,calMonth,1).getDay(), total=new Date(calYear,calMonth+1,0).getDate();
+  const first=new Date(calYear,calMonth,1).getDay(),total=new Date(calYear,calMonth+1,0).getDate();
   const prev=new Date(calYear,calMonth,0).getDate();
   const now=new Date(); const isCur=now.getFullYear()===calYear&&now.getMonth()===calMonth;
   const evDays=new Set(events.map(e=>{const d=new Date(e.date);return d.getFullYear()===calYear&&d.getMonth()===calMonth?d.getDate():null}).filter(Boolean));
@@ -738,7 +935,7 @@ function renderCalendar() {
   let html=DOWS.map(d=>`<div class="cal-dow">${d}</div>`).join('');
   for(let i=0;i<first;i++) html+=`<div class="cal-day other-month">${prev-first+i+1}</div>`;
   for(let d=1;d<=total;d++){
-    const isT=isCur&&d===now.getDate(), isSel=d===selDay&&!isT, hasEv=evDays.has(d);
+    const isT=isCur&&d===now.getDate(),isSel=d===selDay&&!isT,hasEv=evDays.has(d);
     html+=`<div class="cal-day${isT?' today':''}${isSel?' sel':''}${hasEv?' has-event':''}" onclick="selectDay(${d})">${d}</div>`;
   }
   for(let i=1;i<=42-first-total;i++) html+=`<div class="cal-day other-month">${i}</div>`;
@@ -753,17 +950,15 @@ function renderDayEvents() {
   const dayEvs=events.filter(e=>{const d=new Date(e.date);return d.getFullYear()===calYear&&d.getMonth()===calMonth&&d.getDate()===selDay;});
   document.getElementById('events-label').textContent=`Eventos do Dia (${selDay})`;
   const el=document.getElementById('events-day-list');
+  if(!currentUser){el.innerHTML='<div class="lock-msg" style="padding:16px 0"><div class="lock-icon" style="font-size:24px">🔐</div><div class="lock-text">Entre para ver eventos</div></div>';return;}
   if(!dayEvs.length){el.innerHTML='<div class="empty" style="padding:16px 0"><div>Nenhum evento neste dia.</div></div>';return;}
   el.innerHTML=dayEvs.map(e=>`
     <div class="event-item">
       <div class="event-icon" style="background:${TYPE_BG[e.type]||'#1e2538'}">${TYPE_ICONS[e.type]||'📌'}</div>
-      <div class="event-info">
-        <div class="event-name">${esc(e.title)}</div>
-        <div class="event-sub">${e.type}</div>
-      </div>
+      <div class="event-info"><div class="event-name">${esc(e.title)}</div><div class="event-sub">${e.type}</div></div>
       <div class="event-hour">${e.time||'--:--'}</div>
       <div class="item-actions">
-        <button class="icon-btn edit" onclick="editEvent('${gid(e)}')">✏️</button>
+        <button class="icon-btn edit" onclick="requireLogin(()=>editEvent('${gid(e)}'))">✏️</button>
         <button class="icon-btn del"  onclick="deleteEvent('${gid(e)}')">🗑</button>
       </div>
     </div>`).join('');
@@ -772,17 +967,16 @@ function renderDayEvents() {
 function openEventModal(editId) {
   document.getElementById('e-editing-id').value='';
   document.getElementById('event-modal-title').textContent='📅 Novo Evento';
-  if(editId){
+  if(editId&&typeof editId==='string'){
     const ev=events.find(x=>gid(x)===editId); if(!ev) return;
     document.getElementById('e-editing-id').value=editId;
     document.getElementById('event-modal-title').textContent='✏️ Editar Evento';
     document.getElementById('e-title').value=ev.title||'';
     document.getElementById('e-time').value=ev.time||'';
     document.getElementById('e-type').value=ev.type||'outro';
-    document.getElementById('e-desc').value=ev.description||'';
     if(ev.date) document.getElementById('e-date').value=new Date(ev.date).toISOString().split('T')[0];
   } else {
-    ['e-title','e-desc','e-time'].forEach(id=>document.getElementById(id).value='');
+    ['e-title','e-time'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('e-date').value=new Date().toISOString().split('T')[0];
     document.getElementById('e-type').value='trabalho';
   }
@@ -792,170 +986,129 @@ function openEventModal(editId) {
 function editEvent(id){openEventModal(id);}
 
 async function saveEvent() {
-  const title=document.getElementById('e-title').value.trim(), date=document.getElementById('e-date').value;
+  const title=document.getElementById('e-title').value.trim(),date=document.getElementById('e-date').value;
   if(!title||!date) return toast('⚠️ Título e data obrigatórios');
   const editId=document.getElementById('e-editing-id').value;
-  const body={title,date,time:document.getElementById('e-time').value,type:document.getElementById('e-type').value,description:document.getElementById('e-desc').value};
+  const body={title,date,time:document.getElementById('e-time').value,type:document.getElementById('e-type').value};
   if(editId){
-    try{
-      const r=await fetch(`${API}/events/${editId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      const d=await r.json(); if(d.success){const i=events.findIndex(e=>gid(e)===editId);if(i>-1)events[i]=d.data;}else throw 0;
-    }catch{const i=events.findIndex(e=>gid(e)===editId);if(i>-1)Object.assign(events[i],body);save();}
+    const r=await apiPut(`/events/${editId}`,body);
+    if(r.success){const i=events.findIndex(e=>gid(e)===editId);if(i>-1)events[i]=r.data;}
     toast('✏️ Evento atualizado!');
-  }else{
-    try{
-      const r=await fetch(API+'/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      const d=await r.json(); if(d.success) events.push(d.data); else throw 0;
-    }catch{events.push({_id:Date.now().toString(),...body});save();}
+  } else {
+    const r=await apiPost('/events',body);
+    if(r.success) events.push(r.data);
     toast('📅 Evento adicionado!');
   }
-  closeModal('event');
-  renderCalendar();
+  closeModal('event'); renderCalendar();
 }
 
 async function deleteEvent(id) {
-  try{await fetch(`${API}/events/${id}`,{method:'DELETE'});}catch{}
-  events=events.filter(e=>gid(e)!==id); save();
-  renderDayEvents(); toast('🗑 Evento removido');
+  await apiDelete(`/events/${id}`);
+  events=events.filter(e=>gid(e)!==id);
+  renderDayEvents(); toast('🗑 Removido');
 }
 
 // ═══ PROFILE ═══
 function renderProfile() {
-  document.getElementById('profile-name-display').textContent   = profile.name    || 'Estudante';
-  document.getElementById('profile-curso-display').textContent  = profile.curso   || '—';
-  document.getElementById('profile-periodo-display').textContent= profile.periodo || '—';
+  const u=currentUser||{};
+  document.getElementById('profile-name-display').textContent   = u.name    ||'Visitante';
+  document.getElementById('profile-email-display').textContent  = u.email   ||'—';
+  document.getElementById('profile-curso-display').textContent  = u.curso   ||'—';
+  document.getElementById('profile-periodo-display').textContent= u.periodo ||'—';
 }
 
 function openProfileModal() {
-  document.getElementById('p-name').value   = profile.name    || '';
-  document.getElementById('p-curso').value  = profile.curso   || '';
-  document.getElementById('p-periodo').value= profile.periodo || '';
-  document.getElementById('modal-profile').classList.add('open');
+  if(!currentUser) return;
+  document.getElementById('p-name').value   = currentUser.name   ||'';
+  document.getElementById('p-curso').value  = currentUser.curso  ||'';
+  document.getElementById('p-periodo').value= currentUser.periodo||'';
+  document.getElementById('modal-profile-edit').classList.add('open');
 }
 
-function saveProfile() {
-  profile.name   = document.getElementById('p-name').value.trim()   || 'Estudante';
-  profile.curso  = document.getElementById('p-curso').value.trim();
-  profile.periodo= document.getElementById('p-periodo').value.trim();
-  localStorage.setItem('up_profile', JSON.stringify(profile));
-  closeModal('profile'); renderProfile(); renderHome(); toast('✅ Perfil salvo!');
-}
-
-function resetData() {
-  if(!confirm('Resetar todos os dados?')) return;
-  tasks=[];subjects=[];events=[];
-  ['up_tasks','up_subjects','up_events'].forEach(k=>localStorage.removeItem(k));
-  renderAll(); if(document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
-  toast('🔄 Dados resetados');
+async function saveProfile() {
+  const body={name:document.getElementById('p-name').value.trim()||currentUser.name,curso:document.getElementById('p-curso').value.trim(),periodo:document.getElementById('p-periodo').value.trim()};
+  const r=await apiPut('/auth/profile',body);
+  if(r.success){ currentUser={...currentUser,...r.user}; }
+  closeModal('profile-edit'); renderProfile(); renderHome();
+  document.getElementById('chip-name').textContent=currentUser.name;
+  toast('✅ Perfil salvo!');
 }
 
 // ═══ NOTIFICATIONS ═══
 function initEmailStatus() {
-  const email = localStorage.getItem('up_email');
-  const el = document.getElementById('email-status');
-  if (email) { el.textContent='✅ Configurado: '+email; el.className='notif-status on'; }
+  const email=localStorage.getItem('up_email');
+  const el=document.getElementById('email-status');
+  if(email){el.textContent='✅ '+email;el.className='notif-status on';}
 }
 
-function initPushStatus() {
-  if (!('Notification' in window)) return;
-  const el = document.getElementById('push-status');
-  if (Notification.permission==='granted') { el.textContent='✅ Ativado'; el.className='notif-status on'; }
-  else if (Notification.permission==='denied') { el.textContent='❌ Bloqueado (permitir no navegador)'; el.className='notif-status off'; }
-}
-
-function openEmailModal() {
-  const saved = localStorage.getItem('up_email');
+function openEmailModal(){
+  const saved=localStorage.getItem('up_email');
   if(saved) document.getElementById('email-addr').value=saved;
   document.getElementById('modal-email').classList.add('open');
 }
 
-async function saveEmailConfig() {
+async function saveEmailConfig(){
   const email=document.getElementById('email-addr').value.trim();
   if(!email||!email.includes('@')) return toast('⚠️ Email inválido');
-  localStorage.setItem('up_email', email);
-  try {
-    await fetch(API+'/notifications/config-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
-  } catch {}
+  localStorage.setItem('up_email',email);
+  try{await apiPost('/notifications/config-email',{email});}catch{}
   closeModal('email');
   const el=document.getElementById('email-status');
-  el.textContent='✅ Configurado: '+email; el.className='notif-status on';
+  el.textContent='✅ '+email; el.className='notif-status on';
   toast('📧 Email configurado!');
 }
 
-async function testEmail() {
-  toast('📧 Enviando email de teste...');
-  try {
-    const r=await fetch(API+'/notifications/test-email',{method:'POST'});
-    const d=await r.json();
-    toast(d.success ? '✅ Email enviado! Verifique sua caixa.' : '❌ '+d.error);
-  } catch { toast('❌ API não disponível'); }
+async function testEmail(){
+  toast('📧 Enviando...');
+  try{const r=await apiPost('/notifications/test-email',{});toast(r.success?'✅ Email enviado!':'❌ '+r.error);}catch{toast('❌ API indisponível');}
 }
 
-async function testWeekly() {
-  toast('📋 Enviando resumo semanal de teste...');
-  try {
-    const r=await fetch(API+'/notifications/test-weekly',{method:'POST'});
-    const d=await r.json();
-    toast(d.success ? '✅ Resumo enviado!' : '❌ '+d.error);
-  } catch { toast('❌ API não disponível'); }
-}
-
-async function enablePush() {
-  if(!('Notification' in window)) return toast('❌ Seu navegador não suporta Push');
-  const perm = await Notification.requestPermission();
+async function enablePush(){
+  if(!('Notification' in window)) return toast('❌ Navegador não suporta Push');
+  const perm=await Notification.requestPermission();
   if(perm!=='granted') return toast('❌ Permissão negada');
-
-  try {
-    const r=await fetch(API+'/notifications/vapid-public-key');
-    const {publicKey}=await r.json();
-    if(!publicKey) return toast('⚠️ VAPID não configurado no servidor');
-
-    const reg = await navigator.serviceWorker.register('/sw.js');
-    await new Promise(resolve=>setTimeout(resolve,200));
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly:true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey)
-    });
-    await fetch(API+'/notifications/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+  try{
+    const r=await apiGet('/notifications/vapid-public-key');
+    if(!r.publicKey) return toast('⚠️ VAPID não configurado');
+    const reg=await navigator.serviceWorker.register('/sw.js');
+    await new Promise(res=>setTimeout(res,200));
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(r.publicKey)});
+    await apiPost('/notifications/subscribe',sub);
     const el=document.getElementById('push-status');
     el.textContent='✅ Ativado'; el.className='notif-status on';
     toast('🔔 Push ativado!');
-  } catch(err) { toast('❌ Erro: '+err.message); }
+  }catch(err){toast('❌ '+err.message);}
 }
 
-async function testPush() {
-  try {
-    const r=await fetch(API+'/notifications/test-push',{method:'POST'});
-    const d=await r.json();
-    toast(d.success ? '🔔 Push enviado!' : '❌ '+d.error);
-  } catch { toast('❌ API não disponível'); }
+async function testPush(){
+  try{const r=await apiPost('/notifications/test-push',{});toast(r.success?'🔔 Push enviado!':'❌ '+r.error);}catch{toast('❌ API indisponível');}
 }
 
-function urlBase64ToUint8Array(base64String) {
-  const padding='='.repeat((4-base64String.length%4)%4);
-  const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
-  const rawData=window.atob(base64);
-  return Uint8Array.from([...rawData].map(c=>c.charCodeAt(0)));
+function urlBase64ToUint8Array(b){
+  const p='='.repeat((4-b.length%4)%4);
+  const s=(b+p).replace(/-/g,'+').replace(/_/g,'/');
+  return Uint8Array.from([...window.atob(s)].map(c=>c.charCodeAt(0)));
 }
+
+// ═══ API HELPERS ═══
+function authHeaders(){return{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{})};}
+async function apiGet(path){const r=await fetch(API+path,{headers:authHeaders()});return r.json();}
+async function apiPost(path,body){const r=await fetch(API+path,{method:'POST',headers:authHeaders(),body:JSON.stringify(body)});return r.json();}
+async function apiPut(path,body){const r=await fetch(API+path,{method:'PUT',headers:authHeaders(),body:JSON.stringify(body)});return r.json();}
+async function apiDelete(path){const r=await fetch(API+path,{method:'DELETE',headers:authHeaders()});return r.json();}
 
 // ═══ MODALS ═══
-function closeModal(type) { document.getElementById('modal-'+type).classList.remove('open'); }
+function closeModal(type){document.getElementById('modal-'+type).classList.remove('open');}
 function pickColor(c,el){selColor=c;document.querySelectorAll('.color-opt').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
-document.querySelectorAll('.modal-overlay').forEach(o=>
-  o.addEventListener('click',e=>{ if(e.target===o) closeModal(o.id.replace('modal-','')); })
-);
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeModal(o.id.replace('modal-',''));}));
 
 // ═══ UTILS ═══
-function gid(obj){ return String(obj._id||obj.id||''); }
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function save(){ localStorage.setItem('up_tasks',JSON.stringify(tasks)); localStorage.setItem('up_subjects',JSON.stringify(subjects)); localStorage.setItem('up_events',JSON.stringify(events)); }
-function toast(msg){
-  document.querySelectorAll('.toast').forEach(t=>t.remove());
-  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
-  document.body.appendChild(t); setTimeout(()=>t.remove(),2800);
-}
+function gid(obj){return String(obj._id||obj.id||'');}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
 
 init();
+initEmailStatus();
 </script>
 </body>
 </html>
