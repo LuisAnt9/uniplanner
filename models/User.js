@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema({
   periodo:       { type: String, default: "" },
   notifEmail:    { type: String, default: "" },      // email para receber notificações
   notifEnabled:  { type: Boolean, default: true },   // se quer receber notificações
+  resetToken:    { type: String },                   // token para recuperação de senha
+  resetTokenExpiry: { type: Date },                   // expiração do token de recuperação
   createdAt:     { type: Date, default: Date.now },
 });
 
