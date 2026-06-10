@@ -593,6 +593,23 @@
   </div>
 </div>
 
+<!-- MODAL FORGOT PASSWORD -->
+<div class="modal-overlay" id="modal-forgot-password">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔐 Recuperar Senha</div>
+    <div class="error-msg" id="forgot-error"></div>
+    <div class="form-group">
+      <label class="form-label">Email *</label>
+      <input id="forgot-email" class="form-input" type="email" placeholder="seuemail@gmail.com"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('forgot-password')">Cancelar</button>
+      <button class="btn-save" onclick="requestPasswordReset()">Enviar Email</button>
+    </div>
+  </div>
+</div>
+  
 <script>
 const API = '/api';
 let tasks=[], subjects=[], events=[];
@@ -754,6 +771,39 @@ async function doRegister() {
   } catch { errEl.textContent='Erro de conexão'; errEl.classList.add('show'); }
 }
 
+function openForgotPasswordModal() {
+  document.getElementById('forgot-error').classList.remove('show');
+  document.getElementById('forgot-email').value = '';
+  closeModal('auth');
+  document.getElementById('modal-forgot-password').classList.add('open');
+}
+
+async function requestPasswordReset() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const errEl = document.getElementById('forgot-error');
+  errEl.classList.remove('show');
+  
+  if (!email) {
+    errEl.textContent = 'Email é obrigatório';
+    errEl.classList.add('show');
+    return;
+  }
+  
+  try {
+    const r = await apiPost('/auth/forgot-password', { email });
+    if (!r.success) {
+      errEl.textContent = r.error || 'Erro ao solicitar recuperação';
+      errEl.classList.add('show');
+      return;
+    }
+    closeModal('forgot-password');
+    toast('📧 Email de recuperação enviado! Verifique sua caixa de entrada.');
+  } catch {
+    errEl.textContent = 'Erro de conexão';
+    errEl.classList.add('show');
+  }
+}
+  
 function logout() {
   if(!confirm('Sair da conta?')) return;
   token=null; currentUser=null;
