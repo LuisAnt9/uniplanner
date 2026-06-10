@@ -97,4 +97,18 @@ function weeklySummaryHtml({ pending, done, upcoming, userName }) {
     </div>`;
 }
 
-module.exports = { sendEmail, taskAlertHtml, weeklySummaryHtml };
+function passwordResetHtml({ userName, resetLink }) {
+  return `
+    <div style="font-family:sans-serif;background:#0d1117;color:#e8edf5;padding:32px;border-radius:16px;max-width:560px;margin:auto">
+      <h2 style="color:#6b9bff;margin-bottom:8px">🔐 Recuperação de Senha</h2>
+      <p style="color:#7b8ab0;margin-bottom:24px">Olá, ${userName || "Estudante"}! Recebemos uma solicitação para redefinir sua senha.</p>
+      <p style="color:#7b8ab0;margin-bottom:24px">Clique no botão abaixo para criar uma nova senha:</p>
+      <div style="text-align:center;margin-bottom:24px">
+        <a href="${resetLink}" style="display:inline-block;background:#4a7cf7;color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Redefinir Senha</a>
+      </div>
+      <p style="color:#7b8ab0;font-size:12px;margin-top:24px">Se você não solicitou esta recuperação, ignore este email. Seu link expirará em 1 hora.</p>
+      <p style="color:#7b8ab0;font-size:12px;margin-top:8px">UniPlanner — seu organizador universitário 🎓</p>
+    </div>`;
+}
+
+module.exports = { sendEmail, taskAlertHtml, weeklySummaryHtml, passwordResetHtml };
