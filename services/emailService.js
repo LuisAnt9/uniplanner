@@ -1,23 +1,46 @@
-const { Resend } = require("resend");
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+const https = require("https");
 
 async function sendEmail({ to, subject, html }) {
-  if (!process.env.RESEND_API_KEY) {
-    console.warn("⚠️  RESEND_API_KEY não configurada — email não enviado.");
+  if (!process.env.BREVO_API_KEY) {
+    console.warn("⚠️  BREVO_API_KEY não configurada — email não enviado.");
     return;
   }
-  try {
-    await resend.emails.send({
-      from: "UniPlanner <onboarding@resend.dev>",
-      to,
-      subject,
-      html,
+
+  const data = JSON.stringify({
+    sender: { name: "UniPlanner 🎓", email: "noreply@uniplanner.app" },
+    to: [{ email: to }],
+    subject,
+    htmlContent: html,
+  });
+
+  return new Promise((resolve, reject) => {
+    const req = https.request({
+      hostname: "api.brevo.com",
+      path: "/v3/smtp/email",
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+        "content-type": "application/json",
+        "content-length": Buffer.byteLength(data),
+      },
+    }, (res) => {
+      let body = "";
+      res.on("data", chunk => body += chunk);
+      res.on("end", () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          console.log(`📧 Email enviado para ${to}: ${subject}`);
+          resolve();
+        } else {
+          console.error(`❌ Erro ao enviar email: ${res.statusCode} - ${body}`);
+          reject(new Error(body));
+        }
+      });
     });
-    console.log(`📧 Email enviado para ${to}: ${subject}`);
-  } catch (err) {
-    console.error("❌ Erro ao enviar email:", err.message);
-  }
+    req.on("error", reject);
+    req.write(data);
+    req.end();
+  });
 }
 
 function taskAlertHtml(tasks) {
