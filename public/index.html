@@ -88,6 +88,7 @@
     .icon-btn:hover { opacity:1; background:var(--bg3); }
     .icon-btn.edit:hover { color:var(--accent2); }
     .icon-btn.del:hover  { color:var(--red); }
+    .icon-btn.cal:hover  { color:var(--green); }
 
     /* LOCK OVERLAY — shown over lists when not logged */
     .lock-msg { text-align:center; padding:32px 20px; color:var(--muted); }
@@ -341,22 +342,22 @@
       </div>
 
       <div class="section-title" style="width:100%;padding:0;margin-top:20px">🔔 Notificações</div>
-      <div class="notif-card" style="margin:10px 0 10px;width:100%">
-        <div class="notif-card-title">📧 Email — Alertas de Prazo</div>
-        <div class="notif-card-desc">Alertas de vencimento e resumo semanal toda segunda.</div>
-        <div class="notif-status off" id="email-status">Não configurado</div><br/>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-sm btn-accent" onclick="openEmailModal()">⚙️ Configurar</button>
-          <button class="btn-sm btn-secondary" onclick="testEmail()">🧪 Testar</button>
-        </div>
-      </div>
-      <div class="notif-card" style="margin:0 0 10px;width:100%">
-        <div class="notif-card-title">🔔 Push — Notificações</div>
-        <div class="notif-card-desc">Alertas no celular quando o prazo chegar.</div>
+      <div class="notif-card" style="margin:10px 0 10px;width:100%;border-color:#4a7cf740">
+        <div class="notif-card-title">🔔 Push — Notificações no Navegador</div>
+        <div class="notif-card-desc">Receba alertas direto no celular ou computador quando o prazo da tarefa estiver chegando. Recomendado — funciona instantaneamente.</div>
         <div class="notif-status off" id="push-status">Não ativado</div><br/>
         <div style="display:flex;gap:8px">
           <button class="btn-sm btn-accent" onclick="enablePush()">🔔 Ativar</button>
           <button class="btn-sm btn-secondary" onclick="testPush()">🧪 Testar</button>
+        </div>
+      </div>
+      <div class="notif-card" style="margin:0 0 10px;width:100%">
+        <div class="notif-card-title">📧 Email — Alertas de Prazo <span style="font-size:10px;background:#f5c54222;color:#f5c542;padding:2px 8px;border-radius:10px;font-weight:700">BETA</span></div>
+        <div class="notif-card-desc">Alertas de vencimento e resumo semanal por email. Em fase de testes — pode haver atraso ou falha na entrega.</div>
+        <div class="notif-status off" id="email-status">Não configurado</div><br/>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-sm btn-accent" onclick="openEmailModal()">⚙️ Configurar</button>
+          <button class="btn-sm btn-secondary" onclick="testEmail()">🧪 Testar</button>
         </div>
       </div>
     </div>
@@ -403,6 +404,9 @@
         <label class="form-label">Senha</label>
         <input id="login-pass" class="form-input" type="password" placeholder="Sua senha"/>
       </div>
+      <div style="text-align:right;margin-bottom:14px">
+        <span style="font-size:13px;color:var(--accent2);cursor:pointer" onclick="openForgotModal()">Esqueci minha senha</span>
+      </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal('auth')">Cancelar</button>
         <button class="btn-save" onclick="doLogin()">Entrar</button>
@@ -438,6 +442,47 @@
         <button class="btn-cancel" onclick="closeModal('auth')">Cancelar</button>
         <button class="btn-save" onclick="doRegister()">Criar Conta</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ESQUECI SENHA -->
+<div class="modal-overlay" id="modal-forgot">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔐 Esqueci minha senha</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Digite seu email. Enviaremos um link para redefinir sua senha.</p>
+    <div class="error-msg" id="forgot-error"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input id="forgot-email" class="form-input" type="email" placeholder="seuemail@gmail.com"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('forgot')">Cancelar</button>
+      <button class="btn-save" onclick="doForgotPassword()">Enviar Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REDEFINIR SENHA -->
+<div class="modal-overlay" id="modal-reset">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔑 Redefinir Senha</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Digite sua nova senha.</p>
+    <div class="error-msg" id="reset-error"></div>
+    <div class="form-group">
+      <label class="form-label">Nova senha (mínimo 6 caracteres)</label>
+      <input id="reset-pass" class="form-input" type="password" placeholder="Nova senha"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmar nova senha</label>
+      <input id="reset-pass-confirm" class="form-input" type="password" placeholder="Confirme a senha"/>
+    </div>
+    <input type="hidden" id="reset-token-input"/>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('reset')">Cancelar</button>
+      <button class="btn-save" onclick="doResetPassword()">Redefinir</button>
     </div>
   </div>
 </div>
@@ -759,6 +804,64 @@ function logout() {
   toast('👋 Até logo!');
 }
 
+// ═══ ESQUECI MINHA SENHA ═══
+function openForgotModal() {
+  closeModal('auth');
+  document.getElementById('forgot-error').classList.remove('show');
+  document.getElementById('forgot-email').value = '';
+  document.getElementById('modal-forgot').classList.add('open');
+}
+
+async function doForgotPassword() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const errEl = document.getElementById('forgot-error');
+  errEl.classList.remove('show');
+  if (!email || !email.includes('@')) { errEl.textContent='Digite um email válido'; errEl.classList.add('show'); return; }
+  try {
+    const r = await apiPost('/auth/forgot-password', { email });
+    closeModal('forgot');
+    toast(r.message || '📧 Se o email existir, um link foi enviado!');
+  } catch {
+    errEl.textContent='Erro de conexão'; errEl.classList.add('show');
+  }
+}
+
+function openResetModal(resetToken) {
+  document.getElementById('reset-error').classList.remove('show');
+  document.getElementById('reset-pass').value = '';
+  document.getElementById('reset-pass-confirm').value = '';
+  document.getElementById('reset-token-input').value = resetToken;
+  document.getElementById('modal-reset').classList.add('open');
+}
+
+async function doResetPassword() {
+  const pass = document.getElementById('reset-pass').value;
+  const confirm = document.getElementById('reset-pass-confirm').value;
+  const resetToken = document.getElementById('reset-token-input').value;
+  const errEl = document.getElementById('reset-error');
+  errEl.classList.remove('show');
+  if (pass.length < 6) { errEl.textContent='Senha deve ter pelo menos 6 caracteres'; errEl.classList.add('show'); return; }
+  if (pass !== confirm) { errEl.textContent='As senhas não coincidem'; errEl.classList.add('show'); return; }
+  try {
+    const r = await apiPost('/auth/reset-password', { token: resetToken, password: pass });
+    if (!r.success) { errEl.textContent = r.error || 'Erro ao redefinir'; errEl.classList.add('show'); return; }
+    closeModal('reset');
+    toast('✅ Senha redefinida! Faça login.');
+    // Limpa o token da URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+    openAuthModal('login');
+  } catch {
+    errEl.textContent='Erro de conexão'; errEl.classList.add('show');
+  }
+}
+
+// Detecta ?resetToken=xxx na URL ao carregar a página
+function checkResetTokenInUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const resetToken = params.get('resetToken');
+  if (resetToken) openResetModal(resetToken);
+}
+
 // ═══ TASKS ═══
 function switchTab(tab) {
   currentTab=tab;
@@ -789,6 +892,7 @@ function renderTasks() {
       </div>
       <div class="item-actions">
         ${!t.completed?`<button class="icon-btn edit" onclick="editTask('${gid(t)}')">✏️</button>`:''}
+        ${t.dueDate?`<button class="icon-btn cal" onclick="exportTaskToCalendar('${gid(t)}')" title="Exportar para calendário">📆</button>`:''}
         <button class="icon-btn del" onclick="deleteTask('${gid(t)}')">🗑</button>
       </div>
     </div>`;}).join('');
@@ -959,6 +1063,7 @@ function renderDayEvents() {
       <div class="event-hour">${e.time||'--:--'}</div>
       <div class="item-actions">
         <button class="icon-btn edit" onclick="requireLogin(()=>editEvent('${gid(e)}'))">✏️</button>
+        <button class="icon-btn cal" onclick="exportEventToCalendar('${gid(e)}')" title="Exportar para calendário">📆</button>
         <button class="icon-btn del"  onclick="deleteEvent('${gid(e)}')">🗑</button>
       </div>
     </div>`).join('');
@@ -1102,6 +1207,59 @@ function closeModal(type){document.getElementById('modal-'+type).classList.remov
 function pickColor(c,el){selColor=c;document.querySelectorAll('.color-opt').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeModal(o.id.replace('modal-',''));}));
 
+// ═══ EXPORTAR PARA GOOGLE CALENDAR ═══
+function formatGCalDate(date, allDay) {
+  const d = new Date(date);
+  if (allDay) {
+    return d.toISOString().slice(0,10).replace(/-/g,'');
+  }
+  return d.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+}
+
+function openGoogleCalendar({title, details, location, start, end, allDay}) {
+  const base = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+  const dates = allDay
+    ? `${formatGCalDate(start,true)}/${formatGCalDate(end||start,true)}`
+    : `${formatGCalDate(start)}/${formatGCalDate(end||start)}`;
+  const url = `${base}&text=${encodeURIComponent(title)}&dates=${dates}&details=${encodeURIComponent(details||'')}&location=${encodeURIComponent(location||'')}`;
+  window.open(url, '_blank');
+}
+
+function exportTaskToCalendar(id) {
+  const t = tasks.find(x=>gid(x)===id);
+  if (!t || !t.dueDate) return toast('⚠️ Tarefa sem prazo definido');
+  const due = new Date(t.dueDate);
+  const end = new Date(due.getTime() + 30*60*1000); // +30min
+  openGoogleCalendar({
+    title: '📚 ' + t.title,
+    details: t.description || 'Tarefa criada no UniPlanner',
+    start: due,
+    end,
+  });
+  toast('📆 Abrindo Google Calendar...');
+}
+
+function exportEventToCalendar(id) {
+  const e = events.find(x=>gid(x)===id);
+  if (!e) return;
+  const datePart = e.date.split('T')[0];
+  let start, end, allDay = false;
+  if (e.time) {
+    start = new Date(`${datePart}T${e.time}`);
+    end = new Date(start.getTime() + 60*60*1000); // +1h
+  } else {
+    start = new Date(datePart);
+    end = new Date(start.getTime() + 24*60*60*1000);
+    allDay = true;
+  }
+  openGoogleCalendar({
+    title: (TYPE_ICONS[e.type]||'📌') + ' ' + e.title,
+    details: e.description || `Evento (${e.type}) criado no UniPlanner`,
+    start, end, allDay,
+  });
+  toast('📆 Abrindo Google Calendar...');
+}
+
 // ═══ UTILS ═══
 function gid(obj){return String(obj._id||obj.id||'');}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -1109,6 +1267,7 @@ function toast(msg){document.querySelectorAll('.toast').forEach(t=>t.remove());c
 
 init();
 initEmailStatus();
+checkResetTokenInUrl();
 </script>
 </body>
 </html>
