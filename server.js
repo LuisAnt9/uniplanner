@@ -10,6 +10,7 @@ const taskRoutes = require("./routes/taskRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 const { setupVapid } = require("./services/pushService");
 const { startCronJobs } = require("./services/cronJobs");
 
@@ -27,8 +28,10 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 app.use(express.static(path.join(__dirname, "public")));
+app.get("/admin", (req, res) => res.sendFile(path.join(__dirname, "public", "admin.html")));
 app.get("*", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 
 const PORT = process.env.PORT || 3001;

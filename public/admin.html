@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UniPlanner — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0d1117;--bg2:#161b27;--bg3:#1e2538;--border:#ffffff14;--text:#e8edf5;--muted:#7b8ab0;--accent:#4a7cf7;--green:#3ecf8e;--red:#f66;--yellow:#f5c542;--radius:14px}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0}
+
+    /* LOGIN */
+    .login-page{display:flex;align-items:center;justify-content:center;min-height:100vh}
+    .login-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:40px;width:360px}
+    .login-logo{font-size:24px;font-weight:800;color:#fff;margin-bottom:8px}.login-logo span{color:#6b9bff}
+    .login-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+    .form-group{margin-bottom:16px}
+    label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+    input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:14px;font-family:'Nunito',sans-serif;color:var(--text);outline:none}
+    input:focus{border-color:var(--accent)}
+    .btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:8px}
+    .btn:hover{background:#3b6de8}
+    .error-box{background:#f6666618;border:1px solid #f6666630;border-radius:10px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;display:none}
+
+    /* DASHBOARD */
+    .dashboard{display:none}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+    .topbar-logo{font-size:18px;font-weight:800;color:#fff}.topbar-logo span{color:#6b9bff}
+    .topbar-right{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--muted)}
+    .logout-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 14px;color:var(--text);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer}
+
+    .main{padding:32px;max-width:1400px;margin:0 auto}
+    .page-title{font-size:24px;font-weight:800;margin-bottom:4px}
+    .page-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+
+    /* STATS */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+    .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+    .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-weight:700}
+    .stat-value{font-size:32px;font-weight:800;color:#fff}
+    .stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+    .stat-accent{color:#6b9bff}
+
+    /* GRID */
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+    .card-title{font-size:14px;font-weight:800;margin-bottom:16px;color:#fff}
+    .card-title span{font-size:11px;color:var(--muted);font-weight:600;margin-left:8px}
+
+    /* TABLE */
+    table{width:100%;border-collapse:collapse}
+    th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+    td{font-size:13px;padding:10px 12px;border-bottom:1px solid var(--border)}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#ffffff05}
+    .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:700}
+    .badge-green{background:#3ecf8e20;color:var(--green)}
+    .badge-blue{background:#4a7cf720;color:#6b9bff}
+    .badge-yellow{background:#f5c54220;color:var(--yellow)}
+    .badge-red{background:#f6666620;color:var(--red)}
+    .badge-muted{background:#7b8ab020;color:var(--muted)}
+
+    /* ACTION BAR */
+    .action-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .filter-row{display:flex;gap:8px}
+    .filter-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 14px;color:var(--muted);font-size:13px;font-weight:600;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .15s}
+    .filter-btn.active,.filter-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .refresh-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 14px;color:var(--text);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer}
+    .refresh-btn:hover{background:var(--accent);color:#fff}
+
+    /* TABS */
+    .tabs{display:flex;gap:4px;background:var(--bg3);border-radius:12px;padding:4px;margin-bottom:24px}
+    .tab{flex:1;text-align:center;padding:9px;font-size:14px;font-weight:700;border-radius:9px;cursor:pointer;color:var(--muted);border:none;background:none;font-family:'Nunito',sans-serif;transition:all .15s}
+    .tab.active{background:var(--accent);color:#fff}
+
+    .section{display:none}.section.active{display:block}
+    .loading{color:var(--muted);font-size:14px;padding:20px;text-align:center}
+    .empty{color:var(--muted);font-size:14px;padding:30px;text-align:center}
+
+    .action-name{font-weight:700}
+    .action-cat{font-size:11px;color:var(--muted);margin-top:2px}
+    .bar-wrap{display:flex;align-items:center;gap:10px}
+    .bar{height:8px;border-radius:4px;background:var(--accent);transition:width .4s}
+    .bar-count{font-size:12px;color:var(--muted);white-space:nowrap}
+
+    .device-row{display:flex;gap:16px;margin-top:8px}
+    .device-item{flex:1;background:var(--bg3);border-radius:10px;padding:14px;text-align:center}
+    .device-icon{font-size:24px;margin-bottom:4px}
+    .device-value{font-size:20px;font-weight:800}
+    .device-label{font-size:11px;color:var(--muted)}
+
+    canvas{max-height:200px}
+
+    @media(max-width:900px){
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+      .grid-2,.grid-3{grid-template-columns:1fr}
+      .main{padding:16px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-page" id="login-page">
+  <div class="login-box">
+    <div class="login-logo">Uni<span>Planner</span></div>
+    <div class="login-sub">Painel Administrativo</div>
+    <div class="error-box" id="login-error"></div>
+    <div class="form-group">
+      <label>Email</label>
+      <input id="adm-email" type="email" placeholder="seu@email.com"/>
+    </div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input id="adm-pass" type="password" placeholder="Sua senha"/>
+    </div>
+    <button class="btn" onclick="doAdminLogin()">Entrar no Painel</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <div class="topbar">
+    <div class="topbar-logo">Uni<span>Planner</span> <span style="font-size:12px;color:var(--muted);font-weight:600">Admin</span></div>
+    <div class="topbar-right">
+      <span id="admin-name"></span>
+      <button class="logout-btn" onclick="adminLogout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub" id="last-updated">Carregando...</div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchSection('overview')">📊 Visão Geral</button>
+      <button class="tab" onclick="switchSection('users')">👥 Usuários</button>
+      <button class="tab" onclick="switchSection('activity')">📋 Atividade</button>
+      <button class="tab" onclick="switchSection('logs')">🔍 Logs</button>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="section active" id="section-overview">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total de Usuários</div>
+          <div class="stat-value stat-accent" id="s-total-users">—</div>
+          <div class="stat-sub" id="s-new-users-7d">— novos esta semana</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Ações Hoje</div>
+          <div class="stat-value" id="s-actions-today">—</div>
+          <div class="stat-sub" id="s-actions-7d">— nos últimos 7 dias</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Tarefas Criadas</div>
+          <div class="stat-value" id="s-total-tasks">—</div>
+          <div class="stat-sub" id="s-total-events">— eventos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Matérias</div>
+          <div class="stat-value" id="s-total-subjects">—</div>
+          <div class="stat-sub" id="s-new-today">— usuários novos hoje</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">📈 Atividade por Dia <span>últimos 30 dias</span></div>
+          <canvas id="chart-activity"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">⏰ Horários de Pico <span>últimos 30 dias</span></div>
+          <canvas id="chart-hours"></canvas>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">🔥 Funcionalidades Mais Usadas</div>
+          <div id="top-actions-list"><div class="loading">Carregando...</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📱 Dispositivos</div>
+          <div class="device-row">
+            <div class="device-item">
+              <div class="device-icon">📱</div>
+              <div class="device-value" id="d-mobile">—</div>
+              <div class="device-label">Mobile</div>
+            </div>
+            <div class="device-item">
+              <div class="device-icon">🖥️</div>
+              <div class="device-value" id="d-desktop">—</div>
+              <div class="device-label">Desktop</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="section" id="section-users">
+      <div class="action-bar">
+        <div style="font-size:14px;font-weight:700">Todos os Usuários</div>
+        <button class="refresh-btn" onclick="loadUsers()">🔄 Atualizar</button>
+      </div>
+      <div class="card">
+        <div id="users-table"><div class="loading">Carregando...</div></div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="section" id="section-activity">
+      <div class="action-bar">
+        <div style="font-size:14px;font-weight:700">Atividade por Funcionalidade</div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="loadTopActions(7,this)">7 dias</button>
+          <button class="filter-btn" onclick="loadTopActions(30,this)">30 dias</button>
+          <button class="filter-btn" onclick="loadTopActions(90,this)">90 dias</button>
+        </div>
+      </div>
+      <div class="card">
+        <div id="activity-list"><div class="loading">Carregando...</div></div>
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="section" id="section-logs">
+      <div class="action-bar">
+        <div style="font-size:14px;font-weight:700">Logs Recentes</div>
+        <button class="refresh-btn" onclick="loadLogs()">🔄 Atualizar</button>
+      </div>
+      <div class="card">
+        <div id="logs-table"><div class="loading">Carregando...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+let adminToken = localStorage.getItem('adm_token') || null;
+let activityChart = null, hoursChart = null;
+
+// ═══ AUTH ═══
+async function doAdminLogin() {
+  const email = document.getElementById('adm-email').value.trim();
+  const pass  = document.getElementById('adm-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.textContent='Preencha email e senha'; errEl.style.display='block'; return; }
+  try {
+    const r = await fetch(API+'/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password:pass}) });
+    const d = await r.json();
+    if (!d.success) { errEl.textContent=d.error||'Erro ao entrar'; errEl.style.display='block'; return; }
+    adminToken = d.token;
+    localStorage.setItem('adm_token', adminToken);
+    // Verifica se tem acesso admin
+    const test = await apiGet('/analytics/summary');
+    if (!test.success) { errEl.textContent='Você não tem acesso de administrador'; errEl.style.display='block'; adminToken=null; localStorage.removeItem('adm_token'); return; }
+    document.getElementById('admin-name').textContent = d.user.name;
+    showDashboard();
+    loadAll();
+  } catch { errEl.textContent='Erro de conexão'; errEl.style.display='block'; }
+}
+
+function adminLogout() {
+  adminToken=null; localStorage.removeItem('adm_token');
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('login-page').style.display='flex';
+}
+
+function showDashboard() {
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+}
+
+// ═══ DATA ═══
+async function loadAll() {
+  await Promise.all([loadSummary(), loadTopActions(30), loadActivityChart(), loadHoursChart(), loadUsers(), loadLogs()]);
+  document.getElementById('last-updated').textContent = 'Atualizado em ' + new Date().toLocaleTimeString('pt-BR');
+}
+
+async function loadSummary() {
+  const d = await apiGet('/analytics/summary');
+  if (!d.success) return;
+  const s = d.data;
+  document.getElementById('s-total-users').textContent   = s.users.total;
+  document.getElementById('s-new-users-7d').textContent  = `+${s.users.last7d} novos esta semana`;
+  document.getElementById('s-actions-today').textContent = s.activity.today;
+  document.getElementById('s-actions-7d').textContent    = `${s.activity.last7d} nos últimos 7 dias`;
+  document.getElementById('s-total-tasks').textContent   = s.content.tasks;
+  document.getElementById('s-total-events').textContent  = `${s.content.events} eventos`;
+  document.getElementById('s-total-subjects').textContent= s.content.subjects;
+  document.getElementById('s-new-today').textContent     = `${s.users.today} usuários novos hoje`;
+  document.getElementById('d-mobile').textContent  = s.devices.mobile;
+  document.getElementById('d-desktop').textContent = s.devices.desktop;
+}
+
+async function loadTopActions(days=30, btn) {
+  if (btn) {
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  const d = await apiGet(`/analytics/top-actions?days=${days}`);
+  if (!d.success) return;
+  const max = d.data[0]?.count || 1;
+
+  const ACTION_LABELS = {
+    login:'Login', cadastro:'Cadastro', criar_tarefa:'Criar Tarefa',
+    editar_tarefa:'Editar Tarefa', concluir_tarefa:'Concluir Tarefa', deletar_tarefa:'Deletar Tarefa',
+    criar_materia:'Criar Matéria', editar_materia:'Editar Matéria', deletar_materia:'Deletar Matéria',
+    criar_evento:'Criar Evento', editar_evento:'Editar Evento', deletar_evento:'Deletar Evento',
+    editar_perfil:'Editar Perfil', esqueci_senha:'Esqueci Senha', redefinir_senha:'Redefinir Senha',
+  };
+
+  const CAT_COLORS = { auth:'badge-blue', tarefa:'badge-green', materia:'badge-yellow', evento:'badge-red' };
+
+  const html = d.data.map(a => `
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <div>
+          <span class="action-name">${ACTION_LABELS[a._id]||a._id}</span>
+          <span class="badge ${CAT_COLORS[a.category]||'badge-muted'}" style="margin-left:8px">${a.category}</span>
+        </div>
+        <span class="bar-count">${a.count}x</span>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar" style="width:${Math.round(a.count/max*100)}%;flex:1"></div>
+      </div>
+    </div>`).join('');
+
+  const el = document.getElementById('top-actions-list');
+  if (el) el.innerHTML = html || '<div class="empty">Nenhuma atividade</div>';
+
+  const el2 = document.getElementById('activity-list');
+  if (el2) el2.innerHTML = html || '<div class="empty">Nenhuma atividade</div>';
+}
+
+async function loadActivityChart() {
+  const d = await apiGet('/analytics/activity-by-day');
+  if (!d.success) return;
+  const labels = d.data.map(r => r.date.slice(5));
+  const actions = d.data.map(r => r.actions);
+  const users   = d.data.map(r => r.users);
+  const ctx = document.getElementById('chart-activity').getContext('2d');
+  if (activityChart) activityChart.destroy();
+  activityChart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        { label:'Ações', data:actions, borderColor:'#4a7cf7', backgroundColor:'#4a7cf720', fill:true, tension:.4, pointRadius:2 },
+        { label:'Usuários', data:users, borderColor:'#3ecf8e', backgroundColor:'#3ecf8e20', fill:true, tension:.4, pointRadius:2 },
+      ]
+    },
+    options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#7b8ab0', font:{size:11} } } }, scales:{ x:{ ticks:{color:'#7b8ab0',font:{size:10}}, grid:{color:'#ffffff08'} }, y:{ ticks:{color:'#7b8ab0',font:{size:10}}, grid:{color:'#ffffff08'} } } }
+  });
+}
+
+async function loadHoursChart() {
+  const d = await apiGet('/analytics/peak-hours');
+  if (!d.success) return;
+  const ctx = document.getElementById('chart-hours').getContext('2d');
+  if (hoursChart) hoursChart.destroy();
+  hoursChart = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels: d.data.map(h => h.hour+'h'),
+      datasets:[{ label:'Ações', data: d.data.map(h=>h.count), backgroundColor:'#4a7cf760', borderColor:'#4a7cf7', borderWidth:1 }]
+    },
+    options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{color:'#7b8ab0',font:{size:10}}, grid:{color:'#ffffff08'} }, y:{ ticks:{color:'#7b8ab0',font:{size:10}}, grid:{color:'#ffffff08'} } } }
+  });
+}
+
+async function loadUsers() {
+  const d = await apiGet('/analytics/users');
+  if (!d.success) return;
+  const html = `
+    <table>
+      <thead><tr>
+        <th>Nome</th><th>Email</th><th>Curso</th><th>Período</th>
+        <th>Tarefas</th><th>Matérias</th><th>Ações</th><th>Último Acesso</th><th>Cadastro</th>
+      </tr></thead>
+      <tbody>
+        ${d.data.map(u=>`
+          <tr>
+            <td><strong>${esc(u.name)}</strong></td>
+            <td style="color:var(--muted)">${esc(u.email)}</td>
+            <td>${esc(u.curso)||'—'}</td>
+            <td>${esc(u.periodo)||'—'}</td>
+            <td><span class="badge badge-green">${u.tasks}</span></td>
+            <td><span class="badge badge-yellow">${u.subjects}</span></td>
+            <td><span class="badge badge-blue">${u.actions}</span></td>
+            <td style="color:var(--muted);font-size:12px">${u.lastSeen?fmtDate(u.lastSeen):'—'}</td>
+            <td style="color:var(--muted);font-size:12px">${fmtDate(u.createdAt)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+  document.getElementById('users-table').innerHTML = d.data.length ? html : '<div class="empty">Nenhum usuário</div>';
+}
+
+async function loadLogs() {
+  const d = await apiGet('/analytics/logs?limit=100');
+  if (!d.success) return;
+  const ACTION_LABELS = {
+    login:'Login', cadastro:'Cadastro', criar_tarefa:'Criar Tarefa',
+    editar_tarefa:'Editar Tarefa', concluir_tarefa:'Concluir Tarefa', deletar_tarefa:'Deletar Tarefa',
+    criar_materia:'Criar Matéria', editar_materia:'Editar Matéria', deletar_materia:'Deletar Matéria',
+    criar_evento:'Criar Evento', editar_evento:'Editar Evento', deletar_evento:'Deletar Evento',
+    editar_perfil:'Editar Perfil', esqueci_senha:'Esqueci Senha', redefinir_senha:'Redefinir Senha',
+  };
+  const CAT_COLORS = { auth:'badge-blue', tarefa:'badge-green', materia:'badge-yellow', evento:'badge-red' };
+  const html = `
+    <table>
+      <thead><tr><th>Horário</th><th>Usuário</th><th>Ação</th><th>Categoria</th><th>Dispositivo</th></tr></thead>
+      <tbody>
+        ${d.data.map(l=>`
+          <tr>
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">${fmtDateTime(l.createdAt)}</td>
+            <td>
+              <div style="font-weight:700;font-size:13px">${esc(l.userName)}</div>
+              <div style="font-size:11px;color:var(--muted)">${esc(l.userEmail)}</div>
+            </td>
+            <td><strong>${ACTION_LABELS[l.action]||l.action}</strong></td>
+            <td><span class="badge ${CAT_COLORS[l.category]||'badge-muted'}">${l.category}</span></td>
+            <td style="font-size:12px">${l.device==='mobile'?'📱 Mobile':'🖥️ Desktop'}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+  document.getElementById('logs-table').innerHTML = d.data.length ? html : '<div class="empty">Nenhum log</div>';
+}
+
+// ═══ TABS ═══
+function switchSection(name) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ═══ UTILS ═══
+function fmtDate(d){ return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtDateTime(d){ return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function authHeaders(){ return {'Content-Type':'application/json',...(adminToken?{'Authorization':'Bearer '+adminToken}:{})}; }
+async function apiGet(path){ const r=await fetch(API+path,{headers:authHeaders()}); return r.json(); }
+
+// ═══ INIT ═══
+if (adminToken) {
+  showDashboard();
+  apiGet('/analytics/summary').then(d => {
+    if (d.success) {
+      const name = localStorage.getItem('adm_name') || 'Admin';
+      document.getElementById('admin-name').textContent = name;
+      loadAll();
+    } else {
+      adminToken=null; localStorage.removeItem('adm_token');
+    }
+  });
+}
+</script>
+</body>
+</html>
