@@ -228,7 +228,7 @@
       body { background:var(--bg); }
 
       /* Remove limitação mobile */
-      .app { max-width:100%; min-height:100vh; overflow:visible; position:static; display:flex; }
+      .app { max-width:100%; min-height:100vh; overflow:visible; position:static; display:flex; background:var(--bg); }
 
       /* SIDEBAR — aparece no desktop */
       .sidebar {
@@ -293,6 +293,7 @@
         min-height:100vh;
         display:flex;
         flex-direction:column;
+        overflow:hidden;
       }
 
       /* Topo desktop */
@@ -314,7 +315,7 @@
       .desktop-add-btn:hover { background:#3b6de8; }
 
       /* CONTEÚDO DAS PÁGINAS */
-      .desktop-content { padding:32px 40px; flex:1; }
+      .desktop-content { padding:32px 40px; flex:1; overflow-y:auto; }
 
       /* Home desktop — grid de cards */
       .home-cards-desktop { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px; }
@@ -340,8 +341,8 @@
       .back-btn { display:none; }
 
       /* Screens — layout desktop */
-      .screen { position:static; bottom:auto; overflow:visible; padding-bottom:0; animation:none; }
-      .screen.active { display:block; }
+      .screen { position:static; bottom:auto; overflow-y:auto; overflow-x:hidden; padding-bottom:0; animation:none; height:auto; }
+      .screen.active { display:block; min-height:calc(100vh - 65px); }
 
       /* Modal — centralizado no desktop */
       .modal-overlay { align-items:center; }
@@ -617,7 +618,8 @@
     <!-- DESKTOP CONTENT WRAPPER -->
     <div class="desktop-content" id="desktop-content">
 
-  <!-- HOME -->\n  <div class="screen active" id="screen-home">
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
     <div class="topbar">
       <div class="topbar-logo">Uni<span>-Planner</span></div>
       <div class="topbar-icons">
