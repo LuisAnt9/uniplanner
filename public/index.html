@@ -24,6 +24,7 @@
     ═══════════════════════════════ */
     .app { width:100%; max-width:430px; min-height:100vh; background:var(--bg); position:relative; overflow:hidden; margin:0 auto; }
 
+    /* Mobile: screens são absolutas dentro do .app */
     .screen { position:absolute; top:0; left:0; right:0; bottom:var(--nav-h); overflow-y:auto; overflow-x:hidden; padding-bottom:24px; display:none; flex-direction:column; }
     .screen.active { display:flex; animation:slideIn .2s ease; }
     @keyframes slideIn { from{opacity:0;transform:translateX(14px)} to{opacity:1;transform:none} }
@@ -135,7 +136,8 @@
 
     /* PROFILE */
     .profile-wrap { padding:0 20px; display:flex; flex-direction:column; align-items:center; }
-    .avatar { width:90px; height:90px; border-radius:50%; background:var(--bg3); border:3px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:40px; margin-bottom:14px; }
+    .avatar { width:90px; height:90px; border-radius:50%; background:var(--bg3); border:3px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:40px; margin-bottom:14px; overflow:hidden; transition:border-color .2s; }
+    .avatar:hover { border-color:var(--accent2); }
     .profile-name { font-size:22px; font-weight:800; margin-bottom:20px; }
     .profile-info { width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:16px; }
     .profile-row { display:flex; align-items:center; padding:15px 18px; border-bottom:1px solid var(--border); }
@@ -225,10 +227,36 @@
        DESKTOP — ≥ 900px
     ═══════════════════════════════ */
     @media (min-width: 900px) {
-      body { background:var(--bg); }
+      body { background:var(--bg); display:block; }
 
-      /* Remove limitação mobile */
-      .app { max-width:100%; min-height:100vh; overflow:visible; position:static; display:flex; background:var(--bg); }
+      /* Desktop: reseta completamente o layout mobile */
+      .app {
+        max-width:100%;
+        min-height:100vh;
+        background:var(--bg);
+        position:static;
+        overflow:visible;
+        display:block;
+        margin:0;
+      }
+
+      /* Desktop: screens viram blocos normais no fluxo */
+      .screen {
+        position:static !important;
+        top:auto !important;
+        left:auto !important;
+        right:auto !important;
+        bottom:auto !important;
+        overflow:visible;
+        padding-bottom:0;
+        animation:none;
+        display:none;
+        height:auto;
+      }
+      .screen.active {
+        display:block !important;
+        min-height:calc(100vh - 65px);
+      }
 
       /* SIDEBAR — aparece no desktop */
       .sidebar {
@@ -289,11 +317,11 @@
       /* MAIN CONTENT — margem da sidebar */
       .desktop-main {
         margin-left:var(--sidebar-w);
-        flex:1;
         min-height:100vh;
         display:flex;
         flex-direction:column;
-        overflow:hidden;
+        overflow-y:auto;
+        overflow-x:hidden;
       }
 
       /* Topo desktop */
@@ -315,7 +343,7 @@
       .desktop-add-btn:hover { background:#3b6de8; }
 
       /* CONTEÚDO DAS PÁGINAS */
-      .desktop-content { padding:32px 40px; flex:1; overflow-y:auto; }
+      .desktop-content { padding:32px 40px; flex:1; min-height:0; }
 
       /* Home desktop — grid de cards */
       .home-cards-desktop { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px; }
@@ -340,9 +368,7 @@
       .screen-header { display:none; }
       .back-btn { display:none; }
 
-      /* Screens — layout desktop */
-      .screen { position:static; bottom:auto; overflow-y:auto; overflow-x:hidden; padding-bottom:0; animation:none; height:auto; }
-      .screen.active { display:block; min-height:calc(100vh - 65px); }
+      /* Screens já definidas no topo do @media desktop */
 
       /* Modal — centralizado no desktop */
       .modal-overlay { align-items:center; }
@@ -487,7 +513,8 @@
 
     /* PROFILE */
     .profile-wrap { padding:0 20px; display:flex; flex-direction:column; align-items:center; }
-    .avatar { width:90px; height:90px; border-radius:50%; background:var(--bg3); border:3px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:40px; margin-bottom:14px; }
+    .avatar { width:90px; height:90px; border-radius:50%; background:var(--bg3); border:3px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:40px; margin-bottom:14px; overflow:hidden; transition:border-color .2s; }
+    .avatar:hover { border-color:var(--accent2); }
     .profile-name { font-size:22px; font-weight:800; margin-bottom:20px; }
     .profile-info { width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:16px; }
     .profile-row { display:flex; align-items:center; padding:15px 18px; border-bottom:1px solid var(--border); }
@@ -727,7 +754,12 @@
       <div class="screen-title">👤 Perfil</div>
     </div>
     <div class="profile-wrap">
-      <div class="avatar">👩‍🎓</div>
+      <div class="avatar" id="profile-avatar" onclick="triggerAvatarUpload()" title="Clique para alterar foto" style="cursor:pointer;position:relative">
+        <img id="avatar-img" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%"/>
+        <span id="avatar-emoji">👩‍🎓</span>
+        <div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid var(--bg)">📷</div>
+      </div>
+      <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="handleAvatarChange(event)"/>
       <div class="profile-name" id="profile-name-display">Estudante</div>
       <div class="profile-info">
         <div class="profile-row">
@@ -1137,6 +1169,7 @@ function renderLoggedIn() {
   renderTasks(); renderSubjects(); renderProfile();
   renderHome();
   updateDesktopUser();
+  loadAvatar();
 }
 
 // ═══ requireLogin — chave do fluxo ═══
@@ -1884,6 +1917,75 @@ function toast(msg, type='info') {
 function toastError(msg) { toast(msg, 'error'); }
 function toastOk(msg) { toast(msg, 'success'); }
 function toastWarn(msg) { toast(msg, 'warning'); }
+
+// ═══ AVATAR / FOTO DE PERFIL ═══
+function triggerAvatarUpload() {
+  if (!currentUser) return openAuthModal();
+  document.getElementById('avatar-input').click();
+}
+
+function handleAvatarChange(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    toastError('⚠️ Selecione uma imagem válida.');
+    return;
+  }
+
+  if (file.size > 500 * 1024) {
+    toastError('⚠️ Imagem muito grande. Use uma foto menor que 500kb.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const base64 = ev.target.result;
+    // Mostra preview imediato
+    setAvatarDisplay(base64);
+    toastWarn('⏳ Salvando foto...');
+
+    try {
+      const r = await apiPost('/auth/avatar', { avatar: base64 });
+      if (r.success) {
+        currentUser.avatar = base64;
+        toastOk('✅ Foto atualizada!');
+      } else {
+        toastError('❌ ' + (r.error || 'Erro ao salvar foto'));
+        // Reverte para o avatar anterior
+        setAvatarDisplay(currentUser.avatar || '');
+      }
+    } catch (err) {
+      toastError('❌ Erro ao salvar foto');
+      setAvatarDisplay(currentUser.avatar || '');
+    }
+  };
+  reader.readAsDataURL(file);
+  // Limpa o input para permitir selecionar o mesmo arquivo novamente
+  e.target.value = '';
+}
+
+function setAvatarDisplay(base64) {
+  const img   = document.getElementById('avatar-img');
+  const emoji = document.getElementById('avatar-emoji');
+  if (!img || !emoji) return;
+  if (base64) {
+    img.src = base64;
+    img.style.display = 'block';
+    emoji.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    emoji.style.display = 'block';
+  }
+}
+
+function loadAvatar() {
+  if (currentUser?.avatar) {
+    setAvatarDisplay(currentUser.avatar);
+  } else {
+    setAvatarDisplay('');
+  }
+}
 
 init();
 checkResetTokenInUrl();

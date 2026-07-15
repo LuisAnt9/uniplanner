@@ -4,6 +4,7 @@ const {
   register, login, me, updateProfile,
   forgotPassword, resetPassword,
   adminResetPassword, changePassword,
+  updateAvatar,
 } = require("../controllers/authController");
 const { requireAuth } = require("../middleware/auth");
 
@@ -23,5 +24,6 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.post("/change-password", requireAuth, changePassword);
 router.post("/admin-reset-password", requireAuth, requireAdmin, adminResetPassword);
+router.post("/avatar", requireAuth, updateAvatar);
 
 module.exports = router;

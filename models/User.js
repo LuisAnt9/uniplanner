@@ -7,8 +7,9 @@ const userSchema = new mongoose.Schema({
   password:      { type: String, required: true, minlength: 6 },
   curso:         { type: String, default: "" },
   periodo:       { type: String, default: "" },
-  notifEmail:    { type: String, default: "" },      // email para receber notificações
-  notifEnabled:  { type: Boolean, default: true },   // se quer receber notificações
+  notifEmail:    { type: String, default: "" },
+  notifEnabled:  { type: Boolean, default: true },
+  avatar:        { type: String, default: "" },  // base64 da foto de perfil
   resetToken:    { type: String, default: null },
   resetTokenExpires: { type: Date, default: null },
   createdAt:     { type: Date, default: Date.now },

@@ -9,6 +9,7 @@ const userFields = (u) => ({
   id: u._id, name: u.name, email: u.email,
   curso: u.curso, periodo: u.periodo,
   notifEmail: u.notifEmail, notifEnabled: u.notifEnabled,
+  avatar: u.avatar || '',
 });
 
 exports.register = async (req, res, next) => {
@@ -210,6 +211,33 @@ exports.changePassword = async (req, res) => {
 
     await logAction(req, { action: "trocar_senha", category: "auth", details: {} });
     res.json({ success: true, message: "Senha alterada com sucesso!" });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// ─── ATUALIZAR FOTO DE PERFIL ───
+exports.updateAvatar = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    if (!avatar) return res.status(400).json({ success: false, error: "Imagem obrigatória" });
+
+    // Valida se é base64 de imagem
+    if (!avatar.startsWith('data:image/')) {
+      return res.status(400).json({ success: false, error: "Formato de imagem inválido" });
+    }
+
+    // Limita a 500kb (base64 ~667kb de arquivo real)
+    if (avatar.length > 700000) {
+      return res.status(400).json({ success: false, error: "Imagem muito grande. Use uma foto menor que 500kb." });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id, { avatar }, { new: true }
+    ).select("-password");
+
+    await logAction(req, { action: "atualizar_avatar", category: "auth", details: {} });
+    res.json({ success: true, avatar: user.avatar });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
