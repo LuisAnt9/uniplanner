@@ -7,6 +7,7 @@ const {
   updateAvatar,
 } = require("../controllers/authController");
 const { requireAuth } = require("../middleware/auth");
+const { loginLimiter } = require("../middleware/loginLimiter");
 
 // Middleware de admin reutilizável
 const requireAdmin = async (req, res, next) => {
@@ -16,8 +17,8 @@ const requireAdmin = async (req, res, next) => {
   next();
 };
 
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register", loginLimiter, register);
+router.post("/login", loginLimiter, login);
 router.get("/me", requireAuth, me);
 router.put("/profile", requireAuth, updateProfile);
 router.post("/forgot-password", forgotPassword);

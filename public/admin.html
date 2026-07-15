@@ -231,7 +231,10 @@
     <div class="section" id="section-users">
       <div class="action-bar">
         <div style="font-size:14px;font-weight:700">Todos os Usuários</div>
-        <button class="refresh-btn" onclick="loadUsers()">🔄 Atualizar</button>
+        <div style="display:flex;gap:8px">
+          <button class="refresh-btn" onclick="loadUsers()">🔄 Atualizar</button>
+          <button class="refresh-btn" onclick="exportCSV('users')" style="background:var(--green);color:#000;border-color:var(--green)">📥 Exportar CSV</button>
+        </div>
       </div>
       <div class="card">
         <div id="users-table"><div class="loading">Carregando...</div></div>
@@ -257,7 +260,11 @@
     <div class="section" id="section-logs">
       <div class="action-bar">
         <div style="font-size:14px;font-weight:700">Logs Recentes</div>
-        <button class="refresh-btn" onclick="loadLogs()">🔄 Atualizar</button>
+        <div style="display:flex;gap:8px">
+          <button class="refresh-btn" onclick="loadLogs()">🔄 Atualizar</button>
+          <button class="refresh-btn" onclick="exportCSV('logs',7)" style="background:#6b9bff;color:#000;border-color:#6b9bff">📥 7 dias</button>
+          <button class="refresh-btn" onclick="exportCSV('logs',30)" style="background:var(--accent);color:#fff;border-color:var(--accent)">📥 30 dias</button>
+        </div>
       </div>
       <div class="card">
         <div id="logs-table"><div class="loading">Carregando...</div></div>
@@ -544,6 +551,30 @@ function switchSection(name) {
 // ═══ UTILS ═══
 function fmtDate(d){ return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}); }
 function fmtDateTime(d){ return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+
+function exportCSV(type, days) {
+  const path = type === 'users'
+    ? '/api/analytics/export-users'
+    : `/api/analytics/export-logs?days=${days||30}`;
+  // Cria link temporário com token no header via fetch + blob
+  fetch(path, { headers: authHeaders() })
+    .then(r => {
+      if (!r.ok) throw new Error('Erro ao exportar');
+      return r.blob();
+    })
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = type === 'users' ? 'usuarios.csv' : `logs-${days}d.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    })
+    .catch(err => alert('Erro ao exportar: ' + err.message));
+}
+
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function authHeaders(){ return {'Content-Type':'application/json',...(adminToken?{'Authorization':'Bearer '+adminToken}:{})}; }
 async function apiGet(path){ const r=await fetch(API+path,{headers:authHeaders()}); return r.json(); }

@@ -186,3 +186,74 @@ router.get("/peak-hours", requireAuth, requireAdmin, async (req, res) => {
 });
 
 module.exports = router;
+
+// ─── EXPORTAR CSV ───
+router.get("/export-logs", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const Log = require("../models/Log");
+    const days = parseInt(req.query.days) || 30;
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const logs = await Log.find({ createdAt: { $gte: since } }).sort({ createdAt: -1 }).limit(5000);
+
+    const ACTION_LABELS = {
+      login:'Login', cadastro:'Cadastro', criar_tarefa:'Criar Tarefa',
+      editar_tarefa:'Editar Tarefa', concluir_tarefa:'Concluir Tarefa', deletar_tarefa:'Deletar Tarefa',
+      criar_materia:'Criar Matéria', editar_materia:'Editar Matéria', deletar_materia:'Deletar Matéria',
+      criar_evento:'Criar Evento', editar_evento:'Editar Evento', deletar_evento:'Deletar Evento',
+      editar_perfil:'Editar Perfil', trocar_senha:'Trocar Senha', atualizar_avatar:'Atualizar Foto',
+      admin_reset_senha:'Admin Reset Senha', esqueci_senha:'Esqueci Senha', redefinir_senha:'Redefinir Senha',
+    };
+
+    const header = ['Data/Hora','Usuário','Email','Ação','Categoria','Dispositivo','IP'];
+    const rows = logs.map(l => [
+      new Date(l.createdAt).toLocaleString('pt-BR'),
+      `"${(l.userName||'').replace(/"/g,'""')}"`,
+      `"${(l.userEmail||'').replace(/"/g,'""')}"`,
+      `"${ACTION_LABELS[l.action] || l.action}"`,
+      l.category || '',
+      l.device || '',
+      l.ip || '',
+    ].join(','));
+
+    const csv = [header.join(','), ...rows].join('\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="uniplanner-logs-${days}d.csv"`);
+    res.send('\uFEFF' + csv); // BOM para Excel reconhecer UTF-8
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.get("/export-users", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const User = require("../models/User");
+    const Task = require("../models/Task");
+    const Subject = require("../models/Subject");
+
+    const users = await User.find().select("-password -avatar -resetToken").sort({ createdAt: -1 });
+
+    const rows = await Promise.all(users.map(async u => {
+      const [tasks, subjects] = await Promise.all([
+        Task.countDocuments({ user: u._id }),
+        Subject.countDocuments({ user: u._id }),
+      ]);
+      return [
+        `"${(u.name||'').replace(/"/g,'""')}"`,
+        `"${(u.email||'').replace(/"/g,'""')}"`,
+        `"${(u.curso||'').replace(/"/g,'""')}"`,
+        u.periodo || '',
+        tasks,
+        subjects,
+        new Date(u.createdAt).toLocaleString('pt-BR'),
+      ].join(',');
+    }));
+
+    const header = ['Nome','Email','Curso','Período','Tarefas','Matérias','Cadastro'];
+    const csv = [header.join(','), ...rows].join('\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="uniplanner-usuarios.csv"');
+    res.send('\uFEFF' + csv);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
