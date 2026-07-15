@@ -1955,7 +1955,6 @@ function handleAvatarChange(e) {
 
   const reader = new FileReader();
   reader.onload = async (ev) => {
-    // Redimensiona para 400x400 usando Canvas
     const img = new Image();
     img.onload = async () => {
       const canvas = document.createElement('canvas');
@@ -1966,27 +1965,25 @@ function handleAvatarChange(e) {
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       const base64 = canvas.toDataURL('image/jpeg', 0.85);
-      // Mostra preview imediato
       setAvatarDisplay(base64);
-    toastWarn('⏳ Salvando foto...');
-
-    try {
-      const r = await apiPost('/auth/avatar', { avatar: base64 });
-      if (r.success) {
-        currentUser.avatar = base64;
-        toastOk('✅ Foto atualizada!');
-      } else {
-        toastError('❌ ' + (r.error || 'Erro ao salvar foto'));
-        // Reverte para o avatar anterior
+      toastWarn('⏳ Salvando foto...');
+      try {
+        const r = await apiPost('/auth/avatar', { avatar: base64 });
+        if (r.success) {
+          currentUser.avatar = base64;
+          toastOk('✅ Foto atualizada!');
+        } else {
+          toastError('❌ ' + (r.error || 'Erro ao salvar foto'));
+          setAvatarDisplay(currentUser.avatar || '');
+        }
+      } catch (err) {
+        toastError('❌ Erro ao salvar foto');
         setAvatarDisplay(currentUser.avatar || '');
       }
-    } catch (err) {
-      toastError('❌ Erro ao salvar foto');
-      setAvatarDisplay(currentUser.avatar || '');
-    }
+    };
+    img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
-  // Limpa o input para permitir selecionar o mesmo arquivo novamente
   e.target.value = '';
 }
 
