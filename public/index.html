@@ -10,13 +10,373 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg:#0d1117; --bg2:#161b27; --bg3:#1e2538; --bg4:#252d42;
-      --border:#ffffff14; --text:#e8edf5; --muted:#7b8ab0;
+      --border:#ffffff14; --border2:#ffffff22; --text:#e8edf5; --muted:#7b8ab0;
       --accent:#4a7cf7; --accent2:#6b9bff;
       --green:#3ecf8e; --red:#f66; --yellow:#f5c542;
       --radius:16px; --nav-h:68px;
+      --sidebar-w:240px;
     }
-    body { font-family:'Nunito',sans-serif; background:#0a0d14; color:var(--text); min-height:100vh; display:flex; justify-content:center; }
-    .app { width:100%; max-width:430px; min-height:100vh; background:var(--bg); position:relative; overflow:hidden; }
+
+    body { font-family:'Nunito',sans-serif; background:#0a0d14; color:var(--text); min-height:100vh; }
+
+    /* ═══════════════════════════════
+       LAYOUT BASE — MOBILE FIRST
+    ═══════════════════════════════ */
+    .app { width:100%; max-width:430px; min-height:100vh; background:var(--bg); position:relative; overflow:hidden; margin:0 auto; }
+
+    .screen { position:absolute; top:0; left:0; right:0; bottom:var(--nav-h); overflow-y:auto; overflow-x:hidden; padding-bottom:24px; display:none; flex-direction:column; }
+    .screen.active { display:flex; animation:slideIn .2s ease; }
+    @keyframes slideIn { from{opacity:0;transform:translateX(14px)} to{opacity:1;transform:none} }
+    @keyframes fadeUp  { from{opacity:0;transform:translateY(6px)} to{opacity:1} }
+
+    /* TOP BAR — mobile */
+    .topbar { display:flex; align-items:center; justify-content:space-between; padding:52px 20px 12px; }
+    .topbar-logo { font-size:20px; font-weight:800; color:#fff; }
+    .topbar-logo span { color:var(--accent2); }
+    .topbar-icons { display:flex; gap:8px; }
+    .topbar-icon { width:38px; height:38px; border-radius:50%; background:var(--bg3); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:17px; cursor:pointer; }
+
+    /* SCREEN HEADER */
+    .screen-header { display:flex; align-items:center; gap:12px; padding:52px 20px 20px; }
+    .back-btn { width:36px; height:36px; border-radius:10px; background:var(--bg3); border:none; color:var(--text); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .screen-title { font-size:20px; font-weight:800; flex:1; }
+    .header-action { width:36px; height:36px; border-radius:10px; background:var(--bg3); border:none; color:var(--muted); font-size:17px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+
+    /* HOME */
+    .greeting { padding:4px 20px 24px; }
+    .greeting-name { font-size:26px; font-weight:800; color:#fff; margin-bottom:4px; }
+    .greeting-date { font-size:14px; color:var(--muted); font-weight:600; }
+    .home-cards { padding:0 20px; display:flex; flex-direction:column; gap:12px; }
+    .home-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; display:flex; align-items:center; gap:14px; cursor:pointer; transition:border-color .15s; }
+    .home-card:hover { border-color:var(--border2); }
+    .home-card-icon { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+    .home-card-label { font-size:11px; color:var(--muted); font-weight:700; margin-bottom:4px; text-transform:uppercase; letter-spacing:.06em; }
+    .home-card-value { font-size:15px; font-weight:700; color:#fff; }
+    .btn-add-task { margin:20px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-size:16px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .15s; }
+    .btn-add-task:hover { background:#3b6de8; }
+
+    /* LOGIN BANNER */
+    .login-banner { margin:0 20px 16px; background:#1e3a8a22; border:1px solid #4a7cf740; border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:background .15s; }
+    .login-banner:hover { background:#1e3a8a35; }
+    .login-banner-text { flex:1; font-size:13px; color:var(--muted); }
+    .login-banner-text strong { color:var(--accent2); display:block; font-size:14px; margin-bottom:2px; }
+    .login-banner-btn { background:var(--accent); color:#fff; border:none; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; white-space:nowrap; }
+
+    /* USER CHIP */
+    .user-chip { margin:0 20px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:12px 16px; display:flex; align-items:center; gap:10px; }
+    .user-chip-avatar { width:34px; height:34px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+    .user-chip-info { flex:1; min-width:0; }
+    .user-chip-name { font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .user-chip-email { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .logout-btn { background:none; border:1px solid var(--border); border-radius:8px; color:var(--muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; padding:6px 10px; cursor:pointer; white-space:nowrap; }
+    .logout-btn:hover { color:var(--red); border-color:var(--red); }
+
+    /* TABS */
+    .tabs { display:flex; margin:0 20px 16px; background:var(--bg3); border-radius:12px; padding:4px; gap:4px; }
+    .tab { flex:1; text-align:center; padding:9px; font-size:14px; font-weight:700; border-radius:9px; cursor:pointer; color:var(--muted); transition:all .15s; border:none; background:none; font-family:'Nunito',sans-serif; }
+    .tab.active { background:var(--accent); color:#fff; }
+
+    /* QUICK ADD */
+    .quick-add { display:flex; gap:8px; margin:0 20px 16px; }
+    .quick-add input { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:12px 14px; font-size:14px; font-family:'Nunito',sans-serif; color:var(--text); outline:none; min-width:0; }
+    .quick-add input::placeholder { color:var(--muted); }
+    .quick-add input:focus { border-color:var(--accent); }
+    .quick-add button { background:var(--accent); color:#fff; border:none; border-radius:12px; padding:12px 16px; font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; white-space:nowrap; }
+
+    /* TASK ITEM */
+    .task-item { display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid var(--border); animation:fadeUp .2s ease; }
+    .task-checkbox { width:24px; height:24px; border:2px solid var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; font-size:13px; font-weight:800; color:transparent; background:#4a7cf712; transition:all .15s; }
+    .task-checkbox.checked { background:var(--green); border-color:var(--green); color:#fff; }
+    .task-text { flex:1; font-size:15px; font-weight:600; min-width:0; }
+    .task-text.done { text-decoration:line-through; color:var(--muted); }
+    .task-meta { font-size:11px; color:var(--muted); margin-top:2px; }
+    .item-actions { display:flex; gap:2px; flex-shrink:0; }
+    .icon-btn { background:none; border:none; color:var(--muted); font-size:15px; cursor:pointer; padding:5px; opacity:.6; transition:all .15s; border-radius:8px; }
+    .icon-btn:hover { opacity:1; background:var(--bg3); }
+    .icon-btn.edit:hover { color:var(--accent2); }
+    .icon-btn.del:hover  { color:var(--red); }
+    .icon-btn.cal:hover  { color:var(--green); }
+
+    /* LOCK */
+    .lock-msg { text-align:center; padding:32px 20px; color:var(--muted); }
+    .lock-icon { font-size:36px; margin-bottom:10px; opacity:.5; }
+    .lock-text { font-size:14px; margin-bottom:16px; }
+    .lock-btn { background:var(--accent); color:#fff; border:none; border-radius:12px; padding:12px 24px; font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; }
+
+    /* SUBJECTS */
+    .add-subject-btn { margin:0 20px 14px; background:#1e3a8a22; border:1px dashed #4a7cf755; border-radius:var(--radius); padding:14px; color:var(--accent2); font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+    .subject-card { margin:0 20px 10px; border-radius:var(--radius); padding:16px 18px; display:flex; align-items:center; gap:12px; animation:fadeUp .2s ease; }
+    .subject-dot { width:14px; height:14px; border-radius:4px; flex-shrink:0; }
+    .subject-info { flex:1; min-width:0; }
+    .subject-name { font-size:16px; font-weight:800; color:#fff; margin-bottom:3px; }
+    .subject-meta { font-size:13px; color:rgba(255,255,255,.65); }
+
+    /* CALENDAR */
+    .calendar-wrap { padding:0 20px; }
+    .cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .cal-nav-btn { background:var(--bg3); border:none; color:var(--text); width:36px; height:36px; border-radius:10px; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .cal-month { font-size:17px; font-weight:800; }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; text-align:center; }
+    .cal-dow { font-size:12px; font-weight:700; color:var(--muted); padding:6px 0; }
+    .cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; border-radius:50%; cursor:pointer; transition:background .1s; position:relative; }
+    .cal-day:hover:not(.today){ background:var(--bg3); }
+    .cal-day.other-month { color:var(--muted); opacity:.35; }
+    .cal-day.today { background:var(--accent); color:#fff; }
+    .cal-day.sel:not(.today) { background:#4a7cf730; color:var(--accent2); outline:2px solid var(--accent); }
+    .cal-day.has-event::after { content:''; position:absolute; bottom:3px; width:4px; height:4px; border-radius:50%; background:var(--green); }
+    .events-section { margin-top:24px; }
+    .events-label { font-size:15px; font-weight:800; margin-bottom:12px; }
+    .event-item { display:flex; align-items:center; gap:12px; background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:14px 16px; margin-bottom:10px; animation:fadeUp .2s ease; }
+    .event-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .event-info { flex:1; min-width:0; }
+    .event-name { font-size:15px; font-weight:700; }
+    .event-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+    .event-hour { font-size:14px; font-weight:700; color:var(--muted); white-space:nowrap; }
+
+    /* PROFILE */
+    .profile-wrap { padding:0 20px; display:flex; flex-direction:column; align-items:center; }
+    .avatar { width:90px; height:90px; border-radius:50%; background:var(--bg3); border:3px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:40px; margin-bottom:14px; }
+    .profile-name { font-size:22px; font-weight:800; margin-bottom:20px; }
+    .profile-info { width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:16px; }
+    .profile-row { display:flex; align-items:center; padding:15px 18px; border-bottom:1px solid var(--border); }
+    .profile-row:last-child { border-bottom:none; }
+    .profile-row-label { font-size:14px; color:var(--muted); font-weight:600; flex:1; }
+    .profile-row-value { font-size:14px; font-weight:700; text-align:right; }
+    .toggle { width:46px; height:26px; border-radius:13px; background:var(--accent); position:relative; cursor:pointer; transition:background .2s; flex-shrink:0; }
+    .toggle::after { content:''; position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:all .2s; }
+    .toggle.off { background:var(--bg4); }
+    .toggle.off::after { right:auto; left:3px; }
+    .btn-outline { background:transparent; border:1px solid var(--accent); color:var(--accent2); border-radius:12px; padding:12px 24px; font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; width:100%; transition:background .15s; margin-bottom:10px; }
+    .btn-outline:hover { background:#4a7cf718; }
+    .btn-outline.danger { border-color:var(--red); color:var(--red); }
+    .btn-outline.danger:hover { background:#f6666618; }
+
+    /* BOTTOM NAV — só mobile */
+    .bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; height:var(--nav-h); background:var(--bg2); border-top:1px solid var(--border); display:flex; align-items:flex-start; justify-content:space-around; padding-top:10px; z-index:100; }
+    .nav-btn { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:4px 14px; border-radius:12px; border:none; background:none; color:var(--muted); font-family:'Nunito',sans-serif; transition:color .15s; }
+    .nav-btn .nav-icon { font-size:22px; line-height:1; }
+    .nav-btn .nav-label { font-size:11px; font-weight:700; }
+    .nav-btn.active { color:var(--accent); }
+
+    /* SIDEBAR — desktop only (oculta no mobile) */
+    .sidebar { display:none; }
+
+    /* MODAL — bottom sheet no mobile */
+    .modal-overlay { display:none; position:fixed; inset:0; background:#00000088; backdrop-filter:blur(6px); z-index:200; align-items:flex-end; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--bg2); border:1px solid var(--border); border-radius:24px 24px 0 0; padding:20px 20px 40px; width:100%; max-width:430px; animation:sheetUp .25s ease; max-height:90vh; overflow-y:auto; }
+    @keyframes sheetUp { from{transform:translateY(100%)} to{transform:none} }
+    .modal-handle { width:40px; height:4px; background:var(--bg4); border-radius:2px; margin:0 auto 20px; }
+    .modal-title { font-size:18px; font-weight:800; margin-bottom:18px; }
+    .form-group { margin-bottom:14px; }
+    .form-label { font-size:13px; font-weight:700; color:var(--muted); margin-bottom:6px; display:block; }
+    .form-input { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:12px 14px; font-size:14px; font-family:'Nunito',sans-serif; color:var(--text); outline:none; transition:border-color .15s; }
+    .form-input:focus { border-color:var(--accent); }
+    select.form-input option { background:var(--bg3); }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .modal-actions { display:flex; gap:10px; margin-top:18px; }
+    .btn-cancel { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:13px; font-size:15px; font-weight:700; font-family:'Nunito',sans-serif; color:var(--muted); cursor:pointer; }
+    .btn-save { flex:2; background:var(--accent); border:none; border-radius:12px; padding:13px; font-size:15px; font-weight:700; font-family:'Nunito',sans-serif; color:#fff; cursor:pointer; }
+    .btn-save:hover { background:#3b6de8; }
+    .color-row { display:flex; gap:10px; flex-wrap:wrap; }
+    .color-opt { width:30px; height:30px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:transform .1s; }
+    .color-opt.sel { border-color:#fff; transform:scale(1.2); }
+
+    /* AUTH */
+    .auth-tabs { display:flex; background:var(--bg3); border-radius:12px; padding:4px; gap:4px; margin-bottom:20px; }
+    .auth-tab { flex:1; text-align:center; padding:9px; font-size:14px; font-weight:700; border-radius:9px; cursor:pointer; color:var(--muted); border:none; background:none; font-family:'Nunito',sans-serif; transition:all .15s; }
+    .auth-tab.active { background:var(--accent); color:#fff; }
+    .auth-form { display:none; }
+    .auth-form.active { display:block; }
+    .error-msg { background:#f6666618; border:1px solid #f6666630; border-radius:10px; padding:10px 14px; font-size:13px; color:var(--red); margin-bottom:14px; display:none; }
+    .error-msg.show { display:block; }
+
+    /* EMPTY / TOAST / OFFLINE */
+    .empty { text-align:center; padding:40px 20px; color:var(--muted); }
+    .empty-icon { font-size:40px; margin-bottom:10px; opacity:.35; }
+    .toast { position:fixed; bottom:calc(var(--nav-h) + 14px); left:50%; transform:translateX(-50%); background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:12px 22px; font-size:14px; font-weight:600; z-index:9999; white-space:nowrap; animation:toastPop .2s ease; max-width:90vw; overflow:hidden; text-overflow:ellipsis; }
+    .toast.success { background:#3ecf8e18; border-color:#3ecf8e40; color:var(--green); }
+    .toast.error   { background:#f6666618; border-color:#f6666640; color:var(--red); }
+    .toast.warning { background:#f5c54218; border-color:#f5c54240; color:var(--yellow); }
+    @keyframes toastPop { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%)} }
+
+    .offline-banner { display:none; position:fixed; top:0; left:0; right:0; background:#f5c54222; border-bottom:1px solid #f5c54250; padding:10px 16px; font-size:13px; font-weight:700; color:var(--yellow); z-index:999; text-align:center; }
+    .offline-banner.show { display:block; }
+
+    .btn-loading { opacity:.7; pointer-events:none; }
+    .spinner-inline { display:inline-block; width:14px; height:14px; border:2px solid #ffffff40; border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; margin-right:6px; vertical-align:middle; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .skeleton { background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .skeleton-row { height:56px; margin:0 20px 10px; border-radius:var(--radius); }
+
+    .section-title { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; padding:0 20px; margin-bottom:10px; margin-top:20px; }
+    .notif-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin:0 20px 10px; padding:16px 18px; }
+    .notif-card-title { font-size:14px; font-weight:700; margin-bottom:4px; }
+    .notif-card-desc { font-size:12px; color:var(--muted); margin-bottom:12px; }
+    .notif-status { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; display:inline-block; margin-bottom:10px; }
+    .notif-status.on  { background:#3ecf8e20; color:var(--green); }
+    .notif-status.off { background:#7b8ab020; color:var(--muted); }
+    .btn-sm { padding:9px 14px; font-size:13px; border:none; border-radius:10px; font-family:'Nunito',sans-serif; font-weight:700; cursor:pointer; transition:background .15s; }
+    .btn-accent { background:var(--accent); color:#fff; }
+    .btn-secondary { background:var(--bg3); color:var(--text); }
+
+    /* ═══════════════════════════════
+       DESKTOP — ≥ 900px
+    ═══════════════════════════════ */
+    @media (min-width: 900px) {
+      body { background:var(--bg); }
+
+      /* Remove limitação mobile */
+      .app { max-width:100%; min-height:100vh; overflow:visible; position:static; display:flex; }
+
+      /* SIDEBAR — aparece no desktop */
+      .sidebar {
+        display:flex;
+        flex-direction:column;
+        width:var(--sidebar-w);
+        min-height:100vh;
+        background:var(--bg2);
+        border-right:1px solid var(--border);
+        position:fixed;
+        top:0; left:0; bottom:0;
+        z-index:50;
+        padding:28px 0;
+      }
+
+      .sidebar-logo {
+        padding:0 22px 24px;
+        font-size:20px;
+        font-weight:800;
+        color:#fff;
+        border-bottom:1px solid var(--border);
+        margin-bottom:16px;
+      }
+      .sidebar-logo span { color:var(--accent2); }
+
+      .sidebar-nav { flex:1; padding:0 10px; }
+
+      .sidebar-item {
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:11px 14px;
+        border-radius:12px;
+        cursor:pointer;
+        font-size:14px;
+        font-weight:700;
+        color:var(--muted);
+        transition:all .15s;
+        margin-bottom:2px;
+        border:none;
+        background:none;
+        width:100%;
+        font-family:'Nunito',sans-serif;
+        text-align:left;
+      }
+
+      .sidebar-item:hover { background:var(--bg3); color:var(--text); }
+      .sidebar-item.active { background:#4a7cf720; color:var(--accent2); }
+      .sidebar-item .s-icon { font-size:18px; width:22px; text-align:center; flex-shrink:0; }
+
+      .sidebar-footer {
+        padding:16px 22px 0;
+        border-top:1px solid var(--border);
+        font-size:12px;
+        color:var(--muted);
+      }
+
+      /* MAIN CONTENT — margem da sidebar */
+      .desktop-main {
+        margin-left:var(--sidebar-w);
+        flex:1;
+        min-height:100vh;
+        display:flex;
+        flex-direction:column;
+      }
+
+      /* Topo desktop */
+      .desktop-topbar {
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:20px 40px;
+        background:var(--bg2);
+        border-bottom:1px solid var(--border);
+        position:sticky;
+        top:0;
+        z-index:40;
+      }
+
+      .desktop-page-title { font-size:22px; font-weight:800; color:#fff; }
+      .desktop-user-info { display:flex; align-items:center; gap:12px; font-size:14px; color:var(--muted); }
+      .desktop-add-btn { background:var(--accent); color:#fff; border:none; border-radius:10px; padding:10px 20px; font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; display:flex; align-items:center; gap:6px; transition:background .15s; }
+      .desktop-add-btn:hover { background:#3b6de8; }
+
+      /* CONTEÚDO DAS PÁGINAS */
+      .desktop-content { padding:32px 40px; flex:1; }
+
+      /* Home desktop — grid de cards */
+      .home-cards-desktop { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px; }
+      .home-card-desktop { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:24px; cursor:pointer; transition:border-color .15s; }
+      .home-card-desktop:hover { border-color:var(--border2); }
+      .home-card-d-label { font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+      .home-card-d-value { font-size:32px; font-weight:800; color:#fff; margin-bottom:4px; }
+      .home-card-d-sub { font-size:13px; color:var(--muted); }
+
+      /* Tasks desktop — 2 colunas */
+      .tasks-desktop-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+
+      /* Subjects desktop — grid */
+      .subjects-desktop-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:16px; }
+
+      /* Calendar desktop — lado a lado */
+      .calendar-desktop-layout { display:grid; grid-template-columns:380px 1fr; gap:28px; }
+
+      /* Esconde elementos mobile */
+      .bottom-nav { display:none; }
+      .topbar { display:none; }
+      .screen-header { display:none; }
+      .back-btn { display:none; }
+
+      /* Screens — layout desktop */
+      .screen { position:static; bottom:auto; overflow:visible; padding-bottom:0; animation:none; }
+      .screen.active { display:block; }
+
+      /* Modal — centralizado no desktop */
+      .modal-overlay { align-items:center; }
+      .modal {
+        border-radius:20px;
+        max-width:520px;
+        animation:modalIn .2s ease;
+        max-height:85vh;
+      }
+      @keyframes modalIn { from{opacity:0;transform:scale(.96) translateY(8px)} to{opacity:1;transform:none} }
+      .modal-handle { display:none; }
+
+      /* Toast — canto inferior direito no desktop */
+      .toast { bottom:28px; left:auto; right:28px; transform:none; }
+      @keyframes toastPop { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+      /* Offline banner */
+      .offline-banner { max-width:none; }
+
+      /* Profile desktop — centralizado com max-width */
+      .profile-wrap { max-width:560px; margin:0 auto; align-items:flex-start; }
+      .profile-info { width:100%; }
+    }
+
+    /* TABLET — 600–899px */
+    @media (min-width:600px) and (max-width:899px) {
+      .app { max-width:100%; }
+      .bottom-nav { max-width:100%; }
+      .home-cards { display:grid; grid-template-columns:1fr 1fr; }
+      .form-row { grid-template-columns:1fr 1fr; }
+      .modal { max-width:520px; }
+      .subjects-tablet-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    }
+  </style>
+
 
     /* SCREENS */
     .screen { position:absolute; top:0; left:0; right:0; bottom:var(--nav-h); overflow-y:auto; overflow-x:hidden; padding-bottom:24px; display:none; flex-direction:column; }
@@ -221,8 +581,45 @@
 <div class="app">
   <div class="offline-banner" id="offline-banner">⚠️ Sem conexão com a internet — algumas funções podem não funcionar</div>
 
-  <!-- HOME -->
-  <div class="screen active" id="screen-home">
+  <!-- SIDEBAR — desktop only -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">Uni<span>Planner</span></div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-item active" id="snav-home" onclick="goTo('home')">
+        <span class="s-icon">🏠</span> Início
+      </button>
+      <button class="sidebar-item" id="snav-tasks" onclick="goTo('tasks')">
+        <span class="s-icon">✅</span> Tarefas
+      </button>
+      <button class="sidebar-item" id="snav-subjects" onclick="goTo('subjects')">
+        <span class="s-icon">📚</span> Matérias
+      </button>
+      <button class="sidebar-item" id="snav-calendar" onclick="goTo('calendar')">
+        <span class="s-icon">📅</span> Calendário
+      </button>
+      <button class="sidebar-item" id="snav-profile" onclick="goTo('profile')">
+        <span class="s-icon">👤</span> Perfil
+      </button>
+    </nav>
+    <div class="sidebar-footer">UniPlanner v3.0</div>
+  </aside>
+
+  <!-- DESKTOP MAIN WRAPPER -->
+  <div class="desktop-main" id="desktop-main">
+
+    <!-- DESKTOP TOPBAR (preenchida via JS) -->
+    <div class="desktop-topbar" id="desktop-topbar" style="display:none">
+      <div class="desktop-page-title" id="desktop-page-title">Início</div>
+      <div class="desktop-user-info">
+        <span id="desktop-user-name" style="display:none"></span>
+        <button class="desktop-add-btn" id="desktop-add-btn" onclick="desktopAddAction()" style="display:none">＋ Adicionar</button>
+      </div>
+    </div>
+
+    <!-- DESKTOP CONTENT WRAPPER -->
+    <div class="desktop-content" id="desktop-content">
+
+  <!-- HOME -->\n  <div class="screen active" id="screen-home">
     <div class="topbar">
       <div class="topbar-logo">Uni<span>-Planner</span></div>
       <div class="topbar-icons">
@@ -353,6 +750,8 @@
       </div>
       <div id="profile-logged-actions" style="width:100%;display:none">
         <button class="btn-outline" onclick="openProfileModal()">✏️ Editar Perfil</button>
+        <button class="btn-outline" onclick="openChangePassModal()">🔑 Trocar Senha</button>
+        <button class="btn-outline danger" onclick="logout()">🚪 Sair da Conta</button>
         <button class="btn-outline danger" onclick="logout()">🚪 Sair da Conta</button>
       </div>
       <div id="profile-guest-actions" style="width:100%">
@@ -367,15 +766,6 @@
         <div style="display:flex;gap:8px">
           <button class="btn-sm btn-accent" onclick="enablePush()">🔔 Ativar</button>
           <button class="btn-sm btn-secondary" onclick="testPush()">🧪 Testar</button>
-        </div>
-      </div>
-      <div class="notif-card" style="margin:0 0 10px;width:100%">
-        <div class="notif-card-title">📧 Email — Alertas de Prazo <span style="font-size:10px;background:#f5c54222;color:#f5c542;padding:2px 8px;border-radius:10px;font-weight:700">BETA</span></div>
-        <div class="notif-card-desc">Alertas de vencimento e resumo semanal por email. Em fase de testes — pode haver atraso ou falha na entrega.</div>
-        <div class="notif-status off" id="email-status">Não configurado</div><br/>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-sm btn-accent" onclick="openEmailModal()">⚙️ Configurar</button>
-          <button class="btn-sm btn-secondary" onclick="testEmail()">🧪 Testar</button>
         </div>
       </div>
     </div>
@@ -399,7 +789,10 @@
       <span class="nav-icon">👤</span><span class="nav-label">Perfil</span>
     </button>
   </nav>
-</div>
+
+    </div><!-- /desktop-content -->
+  </div><!-- /desktop-main -->
+</div><!-- /app -->
 
 <!-- MODAL AUTH (LOGIN / CADASTRO) -->
 <div class="modal-overlay" id="modal-auth">
@@ -637,21 +1030,31 @@
   </div>
 </div>
 
-<!-- MODAL EMAIL -->
-<div class="modal-overlay" id="modal-email">
+<!-- MODAL TROCAR SENHA -->
+<div class="modal-overlay" id="modal-change-pass">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">📧 Configurar Email</div>
+    <div class="modal-title">🔑 Trocar Senha</div>
+    <div class="error-msg" id="change-pass-error"></div>
     <div class="form-group">
-      <label class="form-label">Seu Email *</label>
-      <input id="email-addr" class="form-input" type="email" placeholder="voce@gmail.com"/>
+      <label class="form-label">Senha atual</label>
+      <input id="cp-current" class="form-input" type="password" placeholder="Sua senha atual"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nova senha (mínimo 6 caracteres)</label>
+      <input id="cp-new" class="form-input" type="password" placeholder="Nova senha"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmar nova senha</label>
+      <input id="cp-confirm" class="form-input" type="password" placeholder="Confirme a nova senha"/>
     </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('email')">Cancelar</button>
-      <button class="btn-save" onclick="saveEmailConfig()">Salvar</button>
+      <button class="btn-cancel" onclick="closeModal('change-pass')">Cancelar</button>
+      <button class="btn-save" id="change-pass-btn" onclick="doChangePassword()">Salvar</button>
     </div>
   </div>
 </div>
+
 
 <script>
 const API = '/api';
@@ -733,6 +1136,7 @@ function renderLoggedIn() {
   document.getElementById('profile-guest-actions').style.display  = 'none';
   renderTasks(); renderSubjects(); renderProfile();
   renderHome();
+  updateDesktopUser();
 }
 
 // ═══ requireLogin — chave do fluxo ═══
@@ -743,13 +1147,58 @@ function requireLogin(action) {
 }
 
 // ═══ NAVIGATION ═══
+const PAGE_TITLES = { home:'Início', tasks:'Tarefas', subjects:'Matérias', calendar:'Calendário', profile:'Perfil' };
+const PAGE_ADD_ACTIONS = { tasks:'openTaskModal', subjects:'openSubjectModal', calendar:'openEventModal' };
+
+function isDesktop() { return window.innerWidth >= 900; }
+
 function goTo(screen) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('screen-'+screen).classList.add('active');
   const nb=document.getElementById('nav-'+screen); if(nb) nb.classList.add('active');
+  const sb=document.getElementById('snav-'+screen); if(sb) sb.classList.add('active');
   if(screen==='calendar') renderCalendar();
+
+  // Atualiza topbar desktop
+  if (isDesktop()) {
+    const topbar = document.getElementById('desktop-topbar');
+    const title  = document.getElementById('desktop-page-title');
+    const addBtn = document.getElementById('desktop-add-btn');
+    if (topbar) topbar.style.display = 'flex';
+    if (title)  title.textContent = PAGE_TITLES[screen] || '';
+    if (addBtn) {
+      if (PAGE_ADD_ACTIONS[screen]) {
+        addBtn.style.display = 'flex';
+        addBtn.onclick = () => requireLogin(window[PAGE_ADD_ACTIONS[screen]]);
+        const labels = { tasks:'＋ Nova Tarefa', subjects:'＋ Nova Matéria', calendar:'＋ Novo Evento' };
+        addBtn.textContent = labels[screen] || '＋ Adicionar';
+      } else {
+        addBtn.style.display = 'none';
+      }
+    }
+  }
 }
+
+function updateDesktopUser() {
+  const el = document.getElementById('desktop-user-name');
+  if (!el) return;
+  if (currentUser) {
+    el.textContent = currentUser.name;
+    el.style.display = 'inline';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function desktopAddAction() {} // preenchida dinamicamente pelo goTo
+
+// Detecta resize para ajustar layout
+window.addEventListener('resize', () => {
+  const topbar = document.getElementById('desktop-topbar');
+  if (topbar) topbar.style.display = isDesktop() ? 'flex' : 'none';
+});
 
 // ═══ HOME ═══
 function renderHome() {
@@ -821,6 +1270,42 @@ async function doRegister() {
     toast(`🎉 Conta criada! Bem-vindo, ${currentUser.name}!`);
     if(pendingAction){ pendingAction(); pendingAction=null; }
   } catch { errEl.textContent='Erro de conexão'; errEl.classList.add('show'); }
+}
+
+// ═══ TROCAR SENHA ═══
+function openChangePassModal() {
+  document.getElementById('cp-current').value = '';
+  document.getElementById('cp-new').value     = '';
+  document.getElementById('cp-confirm').value = '';
+  const errEl = document.getElementById('change-pass-error');
+  errEl.classList.remove('show');
+  document.getElementById('modal-change-pass').classList.add('open');
+}
+
+async function doChangePassword() {
+  const current = document.getElementById('cp-current').value;
+  const newPass = document.getElementById('cp-new').value;
+  const confirm = document.getElementById('cp-confirm').value;
+  const errEl   = document.getElementById('change-pass-error');
+  const btn     = document.getElementById('change-pass-btn');
+  errEl.classList.remove('show');
+
+  if (!current)          { errEl.textContent='Digite sua senha atual';              errEl.classList.add('show'); return; }
+  if (newPass.length < 6){ errEl.textContent='Nova senha deve ter pelo menos 6 caracteres'; errEl.classList.add('show'); return; }
+  if (newPass !== confirm){ errEl.textContent='As senhas não coincidem';             errEl.classList.add('show'); return; }
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  try {
+    const r = await apiPost('/auth/change-password', { currentPassword: current, newPassword: newPass });
+    if (!r.success) { errEl.textContent = r.error; errEl.classList.add('show'); return; }
+    closeModal('change-pass');
+    toastOk('✅ Senha alterada com sucesso!');
+  } catch (err) {
+    errEl.textContent = err.message || 'Erro ao alterar senha';
+    errEl.classList.add('show');
+  } finally {
+    btn.textContent = 'Salvar'; btn.disabled = false;
+  }
 }
 
 function logout() {
@@ -1220,33 +1705,6 @@ async function saveProfile() {
 }
 
 // ═══ NOTIFICATIONS ═══
-function initEmailStatus() {
-  const email=localStorage.getItem('up_email');
-  const el=document.getElementById('email-status');
-  if(email){el.textContent='✅ '+email;el.className='notif-status on';}
-}
-
-function openEmailModal(){
-  const saved=localStorage.getItem('up_email');
-  if(saved) document.getElementById('email-addr').value=saved;
-  document.getElementById('modal-email').classList.add('open');
-}
-
-async function saveEmailConfig(){
-  const email=document.getElementById('email-addr').value.trim();
-  if(!email||!email.includes('@')) return toast('⚠️ Email inválido');
-  localStorage.setItem('up_email',email);
-  try{await apiPost('/notifications/config-email',{email});}catch{}
-  closeModal('email');
-  const el=document.getElementById('email-status');
-  el.textContent='✅ '+email; el.className='notif-status on';
-  toast('📧 Email configurado!');
-}
-
-async function testEmail(){
-  toast('📧 Enviando...');
-  try{const r=await apiPost('/notifications/test-email',{});toast(r.success?'✅ Email enviado!':'❌ '+r.error);}catch{toast('❌ API indisponível');}
-}
 
 async function enablePush(){
   if(!('Notification' in window)) return toast('❌ Navegador não suporta Push');
@@ -1428,9 +1886,16 @@ function toastOk(msg) { toast(msg, 'success'); }
 function toastWarn(msg) { toast(msg, 'warning'); }
 
 init();
-initEmailStatus();
 checkResetTokenInUrl();
 updateOnlineStatus();
+
+// Inicializa layout desktop
+if (isDesktop()) {
+  const topbar = document.getElementById('desktop-topbar');
+  if (topbar) topbar.style.display = 'flex';
+  // Aciona goTo para configurar título e botão correto
+  setTimeout(() => goTo('home'), 0);
+}
 </script>
 </body>
 </html>

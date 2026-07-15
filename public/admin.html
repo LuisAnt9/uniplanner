@@ -99,6 +99,32 @@
       .grid-2,.grid-3{grid-template-columns:1fr}
       .main{padding:16px}
     }
+    /* RESET BUTTON */
+    .reset-btn { background:#4a7cf720; border:1px solid #4a7cf740; color:var(--accent2); border-radius:8px; padding:5px 12px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Nunito',sans-serif; white-space:nowrap; transition:background .15s; }
+    .reset-btn:hover { background:var(--accent); color:#fff; }
+
+    /* RESET MODAL */
+    .modal-overlay-adm { display:none; position:fixed; inset:0; background:#00000090; backdrop-filter:blur(6px); z-index:999; align-items:center; justify-content:center; }
+    .modal-overlay-adm.open { display:flex; }
+    .modal-adm { background:var(--bg2); border:1px solid var(--border); border-radius:20px; padding:28px; width:440px; max-width:95vw; }
+    .modal-adm-title { font-size:18px; font-weight:800; margin-bottom:6px; }
+    .modal-adm-sub { font-size:13px; color:var(--muted); margin-bottom:20px; }
+    .modal-adm label { font-size:12px; font-weight:700; color:var(--muted); display:block; margin-bottom:6px; }
+    .modal-adm input { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:11px 14px; font-size:15px; font-family:'Nunito',monospace; color:var(--text); outline:none; letter-spacing:2px; margin-bottom:6px; }
+    .modal-adm input:focus { border-color:var(--accent); }
+    .modal-adm-actions { display:flex; gap:10px; margin-top:20px; }
+    .btn-adm-cancel { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:11px; font-size:14px; font-weight:700; color:var(--muted); cursor:pointer; font-family:'Nunito',sans-serif; }
+    .btn-adm-confirm { flex:2; background:var(--accent); border:none; border-radius:10px; padding:11px; font-size:14px; font-weight:700; color:#fff; cursor:pointer; font-family:'Nunito',sans-serif; }
+    .btn-adm-confirm:hover { background:#3b6de8; }
+    .btn-adm-confirm:disabled { opacity:.6; pointer-events:none; }
+    .adm-error { background:#f6666618; border:1px solid #f6666630; border-radius:8px; padding:10px 14px; font-size:13px; color:var(--red); margin-bottom:12px; }
+    .user-info-box { background:var(--bg3); border-radius:10px; padding:12px 16px; margin-bottom:16px; }
+    .user-info-box .u-name { font-size:15px; font-weight:800; }
+    .user-info-box .u-email { font-size:12px; color:var(--muted); margin-top:2px; }
+    .pass-row { display:flex; gap:8px; align-items:center; }
+    .pass-row input { flex:1; }
+    .btn-regen { background:var(--bg4); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-size:13px; cursor:pointer; color:var(--muted); white-space:nowrap; }
+    .btn-regen:hover { color:var(--text); }
   </style>
 </head>
 <body>
@@ -383,25 +409,98 @@ async function loadUsers() {
     <table>
       <thead><tr>
         <th>Nome</th><th>Email</th><th>Curso</th><th>Período</th>
-        <th>Tarefas</th><th>Matérias</th><th>Ações</th><th>Último Acesso</th><th>Cadastro</th>
+        <th>Tarefas</th><th>Ações</th><th>Último Acesso</th><th>Cadastro</th><th>Senha</th>
       </tr></thead>
       <tbody>
         ${d.data.map(u=>`
           <tr>
             <td><strong>${esc(u.name)}</strong></td>
-            <td style="color:var(--muted)">${esc(u.email)}</td>
+            <td style="color:var(--muted);font-size:12px">${esc(u.email)}</td>
             <td>${esc(u.curso)||'—'}</td>
             <td>${esc(u.periodo)||'—'}</td>
             <td><span class="badge badge-green">${u.tasks}</span></td>
-            <td><span class="badge badge-yellow">${u.subjects}</span></td>
             <td><span class="badge badge-blue">${u.actions}</span></td>
-            <td style="color:var(--muted);font-size:12px">${u.lastSeen?fmtDate(u.lastSeen):'—'}</td>
+            <td style="color:var(--muted);font-size:12px">${u.lastSeen?fmtDateTime(u.lastSeen):'—'}</td>
             <td style="color:var(--muted);font-size:12px">${fmtDate(u.createdAt)}</td>
+            <td>
+              <button class="reset-btn" onclick="openResetModal('${u.id}','${esc(u.name)}','${esc(u.email)}')">
+                🔑 Resetar
+              </button>
+            </td>
           </tr>`).join('')}
       </tbody>
     </table>`;
   document.getElementById('users-table').innerHTML = d.data.length ? html : '<div class="empty">Nenhum usuário</div>';
 }
+
+// ─── RESET SENHA ADMIN ───
+function openResetModal(userId, userName, userEmail) {
+  const tempPass = generateTempPassword();
+  document.getElementById('reset-user-id').value    = userId;
+  document.getElementById('reset-user-name').textContent  = userName;
+  document.getElementById('reset-user-email').textContent = userEmail;
+  document.getElementById('reset-new-pass').value   = tempPass;
+  document.getElementById('reset-result').style.display = 'none';
+  document.getElementById('reset-error-box').style.display = 'none';
+  document.getElementById('modal-reset').style.display = 'flex';
+}
+
+function closeResetModal() {
+  document.getElementById('modal-reset').style.display = 'none';
+}
+
+function generateTempPassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  return Array.from({length: 8}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+function copyTempPass() {
+  const pass = document.getElementById('reset-new-pass').value;
+  navigator.clipboard.writeText(pass).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✅ Copiado!';
+    setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+  });
+}
+
+async function doAdminReset() {
+  const userId  = document.getElementById('reset-user-id').value;
+  const newPass = document.getElementById('reset-new-pass').value.trim();
+  const errBox  = document.getElementById('reset-error-box');
+  const result  = document.getElementById('reset-result');
+  errBox.style.display = 'none';
+  result.style.display = 'none';
+
+  if (!newPass || newPass.length < 6) {
+    errBox.textContent = 'Senha deve ter pelo menos 6 caracteres';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('reset-confirm-btn');
+  btn.textContent = 'Resetando...'; btn.disabled = true;
+
+  try {
+    const r = await apiPost('/auth/admin-reset-password', { userId, newPassword: newPass });
+    if (!r.success) {
+      errBox.textContent = r.error; errBox.style.display = 'block';
+    } else {
+      result.innerHTML = `
+        <div style="background:#3ecf8e18;border:1px solid #3ecf8e40;border-radius:10px;padding:14px 16px">
+          <div style="font-weight:800;color:#3ecf8e;margin-bottom:8px">✅ Senha resetada!</div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:6px">Envie para o aluno:</div>
+          <div style="background:var(--bg3);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:15px;letter-spacing:2px;color:#fff;margin-bottom:10px">${esc(newPass)}</div>
+          <button onclick="navigator.clipboard.writeText('${esc(newPass)}').then(()=>this.textContent='✅ Copiado!')" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📋 Copiar Senha</button>
+        </div>`;
+      result.style.display = 'block';
+    }
+  } catch {
+    errBox.textContent = 'Erro de conexão'; errBox.style.display = 'block';
+  } finally {
+    btn.textContent = '🔑 Resetar Senha'; btn.disabled = false;
+  }
+}
+
 
 async function loadLogs() {
   const d = await apiGet('/analytics/logs?limit=100');
@@ -463,5 +562,36 @@ if (adminToken) {
   });
 }
 </script>
+<!-- MODAL RESET SENHA -->
+<div class="modal-overlay-adm" id="modal-reset">
+  <div class="modal-adm">
+    <div class="modal-adm-title">🔑 Resetar Senha</div>
+    <div class="modal-adm-sub">Uma senha temporária será gerada. Envie para o aluno pelo WhatsApp.</div>
+
+    <div class="user-info-box">
+      <div class="u-name" id="reset-user-name"></div>
+      <div class="u-email" id="reset-user-email"></div>
+    </div>
+
+    <div id="reset-error-box" class="adm-error" style="display:none"></div>
+
+    <label>Senha temporária</label>
+    <div class="pass-row">
+      <input type="text" id="reset-new-pass" placeholder="Senha temporária" autocomplete="off"/>
+      <button class="btn-regen" onclick="document.getElementById('reset-new-pass').value=generateTempPassword()" title="Gerar nova senha">🔄</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Clique em 🔄 para gerar outra senha aleatória</div>
+
+    <input type="hidden" id="reset-user-id"/>
+
+    <div id="reset-result" style="display:none;margin-top:16px"></div>
+
+    <div class="modal-adm-actions">
+      <button class="btn-adm-cancel" onclick="closeResetModal()">Cancelar</button>
+      <button class="btn-adm-confirm" id="reset-confirm-btn" onclick="doAdminReset()">🔑 Resetar Senha</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

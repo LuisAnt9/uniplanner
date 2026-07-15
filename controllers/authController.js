@@ -163,3 +163,54 @@ exports.resetPassword = async (req, res, next) => {
     next(err);
   }
 };
+
+// ─── ADMIN — Resetar senha de qualquer usuário ───
+exports.adminResetPassword = async (req, res) => {
+  try {
+    const { userId, newPassword } = req.body;
+    if (!userId || !newPassword)
+      return res.status(400).json({ success: false, error: "userId e newPassword obrigatórios" });
+    if (newPassword.length < 6)
+      return res.status(400).json({ success: false, error: "Senha deve ter pelo menos 6 caracteres" });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ success: false, error: "Usuário não encontrado" });
+
+    user.password = newPassword; // re-hasheada pelo pre-save hook
+    user.resetToken = null;
+    user.resetTokenExpires = null;
+    await user.save();
+
+    req.user = req.user || user;
+    await logAction(req, { action: "admin_reset_senha", category: "auth", details: { targetUser: user.email } });
+    res.json({ success: true, message: `Senha de ${user.name} redefinida com sucesso.` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// ─── ALUNO — Trocar própria senha ───
+exports.changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword)
+      return res.status(400).json({ success: false, error: "Senha atual e nova senha são obrigatórias" });
+    if (newPassword.length < 6)
+      return res.status(400).json({ success: false, error: "Nova senha deve ter pelo menos 6 caracteres" });
+
+    const user = await User.findById(req.user._id);
+    const ok = await user.comparePassword(currentPassword);
+    if (!ok) return res.status(401).json({ success: false, error: "Senha atual incorreta" });
+
+    if (currentPassword === newPassword)
+      return res.status(400).json({ success: false, error: "A nova senha deve ser diferente da atual" });
+
+    user.password = newPassword;
+    await user.save();
+
+    await logAction(req, { action: "trocar_senha", category: "auth", details: {} });
+    res.json({ success: true, message: "Senha alterada com sucesso!" });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
