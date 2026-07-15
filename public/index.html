@@ -185,8 +185,25 @@
     /* EMPTY / TOAST */
     .empty { text-align:center; padding:40px 20px; color:var(--muted); }
     .empty-icon { font-size:40px; margin-bottom:10px; opacity:.35; }
-    .toast { position:fixed; bottom:calc(var(--nav-h) + 14px); left:50%; transform:translateX(-50%); background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:12px 22px; font-size:14px; font-weight:600; z-index:9999; white-space:nowrap; animation:toastPop .2s ease; }
+    .toast { position:fixed; bottom:calc(var(--nav-h) + 14px); left:50%; transform:translateX(-50%); background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:12px 22px; font-size:14px; font-weight:600; z-index:9999; white-space:nowrap; animation:toastPop .2s ease; max-width:90vw; text-overflow:ellipsis; overflow:hidden; }
+    .toast.success { background:#3ecf8e18; border-color:#3ecf8e40; color:var(--green); }
+    .toast.error   { background:#f6666618; border-color:#f6666640; color:var(--red); }
+    .toast.warning { background:#f5c54218; border-color:#f5c54240; color:var(--yellow); }
     @keyframes toastPop { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%)} }
+
+    /* OFFLINE BANNER */
+    .offline-banner { display:none; position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; background:#f5c54222; border-bottom:1px solid #f5c54250; padding:10px 16px; font-size:13px; font-weight:700; color:var(--yellow); z-index:999; text-align:center; }
+    .offline-banner.show { display:block; }
+
+    /* LOADING BUTTON STATE */
+    .btn-loading { opacity:.7; pointer-events:none; }
+    .spinner-inline { display:inline-block; width:14px; height:14px; border:2px solid #ffffff40; border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; margin-right:6px; vertical-align:middle; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* SKELETON */
+    .skeleton { background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .skeleton-row { height:56px; margin:0 20px 10px; border-radius:var(--radius); }
 
     .section-title { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; padding:0 20px; margin-bottom:10px; margin-top:20px; }
     .notif-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin:0 20px 10px; padding:16px 18px; }
@@ -202,6 +219,7 @@
 </head>
 <body>
 <div class="app">
+  <div class="offline-banner" id="offline-banner">⚠️ Sem conexão com a internet — algumas funções podem não funcionar</div>
 
   <!-- HOME -->
   <div class="screen active" id="screen-home">
@@ -678,6 +696,9 @@ async function restoreSession() {
 }
 
 async function fetchUserData() {
+  // Mostra skeletons enquanto carrega
+  showSkeletons('task-list', 4);
+  showSkeletons('subject-list', 3);
   try {
     const [t,s,e] = await Promise.all([
       apiGet('/tasks'), apiGet('/subjects'), apiGet('/events'),
@@ -685,7 +706,13 @@ async function fetchUserData() {
     tasks    = t.data || [];
     subjects = s.data || [];
     events   = e.data || [];
-  } catch { tasks=[]; subjects=[]; events=[]; }
+  } catch (err) {
+    tasks=[]; subjects=[]; events=[];
+    // Só mostra erro se não for problema de sessão (401 já tratado no apiFetch)
+    if (!err.message?.includes('expirada') && !err.message?.includes('Não autenticado')) {
+      toastError('⚠️ Não foi possível carregar seus dados. Verifique sua conexão.');
+    }
+  }
 }
 
 function renderGuest() {
@@ -929,37 +956,67 @@ function openTaskModal(editId) {
 function editTask(id){ requireLogin(()=>openTaskModal(id)); }
 
 async function saveTask() {
-  const title=document.getElementById('t-title').value.trim();
-  if(!title) return toast('⚠️ Título obrigatório');
-  const editId=document.getElementById('t-editing-id').value;
-  const body={title,description:document.getElementById('t-desc').value,dueDate:document.getElementById('t-due').value||new Date().toISOString(),subject:document.getElementById('t-subject').value||null,difficulty:parseInt(document.getElementById('t-difficulty').value)||1};
-  if(editId){ await doUpdateTask(editId,body); } else { await doAddTask(body); }
-  closeModal('task');
+  const title = document.getElementById('t-title').value.trim();
+  const dueDate = document.getElementById('t-due').value;
+  if (!title || title.length < 2) return toastError('⚠️ Título deve ter pelo menos 2 caracteres.');
+  if (!dueDate) return toastError('⚠️ Selecione um prazo para a tarefa.');
+  const editId = document.getElementById('t-editing-id').value;
+  const body = {
+    title,
+    description: document.getElementById('t-desc').value,
+    dueDate,
+    subject: document.getElementById('t-subject').value || null,
+    difficulty: parseInt(document.getElementById('t-difficulty').value) || 1,
+  };
+  const btn = document.querySelector('#modal-task .btn-save');
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  try {
+    if (editId) { await doUpdateTask(editId, body); } else { await doAddTask(body); }
+    closeModal('task');
+  } catch (err) {
+    toastError('❌ ' + err.message);
+  } finally {
+    btn.textContent = 'Salvar'; btn.disabled = false;
+  }
 }
 
 async function doAddTask(body) {
-  const r=await apiPost('/tasks',body);
-  if(r.success) tasks.unshift(r.data);
-  renderTasks(); renderHome(); toast('✅ Tarefa adicionada!');
+  const r = await apiPost('/tasks', body);
+  if (!r.success) throw new Error(r.error || 'Erro ao criar tarefa.');
+  tasks.unshift(r.data);
+  renderTasks(); renderHome(); toastOk('✅ Tarefa adicionada!');
 }
 
-async function doUpdateTask(id,body) {
-  const r=await apiPut(`/tasks/${id}`,body);
-  if(r.success){const i=tasks.findIndex(t=>gid(t)===id);if(i>-1)tasks[i]=r.data;}
-  renderTasks(); renderHome(); toast('✏️ Tarefa atualizada!');
+async function doUpdateTask(id, body) {
+  const r = await apiPut(`/tasks/${id}`, body);
+  if (!r.success) throw new Error(r.error || 'Erro ao atualizar tarefa.');
+  const i = tasks.findIndex(t => gid(t) === id);
+  if (i > -1) tasks[i] = r.data;
+  renderTasks(); renderHome(); toastOk('✏️ Tarefa atualizada!');
 }
 
-async function toggleTask(id,done) {
-  if(done) return;
-  const r=await apiPut(`/tasks/${id}/complete`,{});
-  if(r.success){const i=tasks.findIndex(t=>gid(t)===id);if(i>-1)tasks[i]=r.data;}
-  renderTasks(); renderHome(); toast('✅ Concluída!');
+async function toggleTask(id, done) {
+  if (done) return;
+  try {
+    const r = await apiPut(`/tasks/${id}/complete`, {});
+    if (!r.success) throw new Error(r.error);
+    const i = tasks.findIndex(t => gid(t) === id);
+    if (i > -1) tasks[i] = r.data;
+    renderTasks(); renderHome(); toastOk('✅ Concluída!');
+  } catch (err) {
+    toastError('❌ ' + err.message);
+  }
 }
 
 async function deleteTask(id) {
-  await apiDelete(`/tasks/${id}`);
-  tasks=tasks.filter(t=>gid(t)!==id);
-  renderTasks(); renderHome(); toast('🗑 Removida');
+  try {
+    const r = await apiDelete(`/tasks/${id}`);
+    if (!r.success) throw new Error(r.error);
+    tasks = tasks.filter(t => gid(t) !== id);
+    renderTasks(); renderHome(); toastOk('🗑 Tarefa removida.');
+  } catch (err) {
+    toastError('❌ ' + err.message);
+  }
 }
 
 // ═══ SUBJECTS ═══
@@ -1006,25 +1063,36 @@ function openSubjectModal(editId) {
 function editSubject(id){openSubjectModal(id);}
 
 async function saveSubject() {
-  const name=document.getElementById('s-name').value.trim(); if(!name) return toast('⚠️ Nome obrigatório');
+  const name=document.getElementById('s-name').value.trim();
+  if(!name||name.length<2) return toastError('⚠️ Nome deve ter pelo menos 2 caracteres.');
   const editId=document.getElementById('s-editing-id').value;
   const body={name,teacher:document.getElementById('s-teacher').value,schedule:document.getElementById('s-schedule').value,color:selColor};
-  if(editId){
-    const r=await apiPut(`/subjects/${editId}`,body);
-    if(r.success){const i=subjects.findIndex(s=>gid(s)===editId);if(i>-1)subjects[i]=r.data;}
-    toast('✏️ Matéria atualizada!');
-  } else {
-    const r=await apiPost('/subjects',body);
-    if(r.success) subjects.push(r.data);
-    toast('📚 Matéria adicionada!');
-  }
-  closeModal('subject'); renderSubjects(); renderHome();
+  const btn=document.querySelector('#modal-subject .btn-save');
+  btn.textContent='Salvando...'; btn.disabled=true;
+  try {
+    if(editId){
+      const r=await apiPut(`/subjects/${editId}`,body);
+      if(!r.success) throw new Error(r.error||'Erro ao atualizar.');
+      const i=subjects.findIndex(s=>gid(s)===editId); if(i>-1) subjects[i]=r.data;
+      toastOk('✏️ Matéria atualizada!');
+    } else {
+      const r=await apiPost('/subjects',body);
+      if(!r.success) throw new Error(r.error||'Erro ao criar matéria.');
+      subjects.push(r.data);
+      toastOk('📚 Matéria adicionada!');
+    }
+    closeModal('subject'); renderSubjects(); renderHome();
+  } catch(err){ toastError('❌ '+err.message); }
+  finally{ btn.textContent='Salvar'; btn.disabled=false; }
 }
 
 async function deleteSubject(id) {
-  await apiDelete(`/subjects/${id}`);
-  subjects=subjects.filter(s=>gid(s)!==id);
-  renderSubjects(); toast('🗑 Removida');
+  try {
+    const r=await apiDelete(`/subjects/${id}`);
+    if(!r.success) throw new Error(r.error);
+    subjects=subjects.filter(s=>gid(s)!==id);
+    renderSubjects(); toastOk('🗑 Matéria removida.');
+  } catch(err){ toastError('❌ '+err.message); }
 }
 
 // ═══ CALENDAR ═══
@@ -1091,26 +1159,38 @@ function openEventModal(editId) {
 function editEvent(id){openEventModal(id);}
 
 async function saveEvent() {
-  const title=document.getElementById('e-title').value.trim(),date=document.getElementById('e-date').value;
-  if(!title||!date) return toast('⚠️ Título e data obrigatórios');
+  const title=document.getElementById('e-title').value.trim();
+  const date=document.getElementById('e-date').value;
+  if(!title||title.length<2) return toastError('⚠️ Título deve ter pelo menos 2 caracteres.');
+  if(!date) return toastError('⚠️ Selecione uma data para o evento.');
   const editId=document.getElementById('e-editing-id').value;
   const body={title,date,time:document.getElementById('e-time').value,type:document.getElementById('e-type').value};
-  if(editId){
-    const r=await apiPut(`/events/${editId}`,body);
-    if(r.success){const i=events.findIndex(e=>gid(e)===editId);if(i>-1)events[i]=r.data;}
-    toast('✏️ Evento atualizado!');
-  } else {
-    const r=await apiPost('/events',body);
-    if(r.success) events.push(r.data);
-    toast('📅 Evento adicionado!');
-  }
-  closeModal('event'); renderCalendar();
+  const btn=document.querySelector('#modal-event .btn-save');
+  btn.textContent='Salvando...'; btn.disabled=true;
+  try {
+    if(editId){
+      const r=await apiPut(`/events/${editId}`,body);
+      if(!r.success) throw new Error(r.error||'Erro ao atualizar evento.');
+      const i=events.findIndex(e=>gid(e)===editId); if(i>-1) events[i]=r.data;
+      toastOk('✏️ Evento atualizado!');
+    } else {
+      const r=await apiPost('/events',body);
+      if(!r.success) throw new Error(r.error||'Erro ao criar evento.');
+      events.push(r.data);
+      toastOk('📅 Evento adicionado!');
+    }
+    closeModal('event'); renderCalendar();
+  } catch(err){ toastError('❌ '+err.message); }
+  finally{ btn.textContent='Salvar'; btn.disabled=false; }
 }
 
 async function deleteEvent(id) {
-  await apiDelete(`/events/${id}`);
-  events=events.filter(e=>gid(e)!==id);
-  renderDayEvents(); toast('🗑 Removido');
+  try {
+    const r=await apiDelete(`/events/${id}`);
+    if(!r.success) throw new Error(r.error);
+    events=events.filter(e=>gid(e)!==id);
+    renderDayEvents(); toastOk('🗑 Evento removido.');
+  } catch(err){ toastError('❌ '+err.message); }
 }
 
 // ═══ PROFILE ═══
@@ -1197,10 +1277,46 @@ function urlBase64ToUint8Array(b){
 
 // ═══ API HELPERS ═══
 function authHeaders(){return{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{})};}
-async function apiGet(path){const r=await fetch(API+path,{headers:authHeaders()});return r.json();}
-async function apiPost(path,body){const r=await fetch(API+path,{method:'POST',headers:authHeaders(),body:JSON.stringify(body)});return r.json();}
-async function apiPut(path,body){const r=await fetch(API+path,{method:'PUT',headers:authHeaders(),body:JSON.stringify(body)});return r.json();}
-async function apiDelete(path){const r=await fetch(API+path,{method:'DELETE',headers:authHeaders()});return r.json();}
+// ═══ API HELPERS — com tratamento robusto de erros ═══
+const FRIENDLY_ERRORS = {
+  'Failed to fetch': 'Sem conexão com o servidor. Verifique sua internet.',
+  'NetworkError': 'Erro de rede. Verifique sua conexão.',
+  'Load failed': 'Não foi possível conectar ao servidor.',
+};
+
+async function apiFetch(path, options = {}) {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    const r = await fetch(API + path, {
+      ...options,
+      headers: { ...authHeaders(), ...(options.headers || {}) },
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    const data = await r.json();
+    // Token expirado — faz logout automático
+    if (r.status === 401 && currentUser) {
+      token = null; currentUser = null;
+      localStorage.removeItem('up_token');
+      renderGuest(); renderHome();
+      toast('⚠️ Sua sessão expirou. Faça login novamente.');
+      throw new Error('Sessão expirada');
+    }
+    return data;
+  } catch (err) {
+    if (err.name === 'AbortError')
+      throw new Error('O servidor demorou para responder. Tente novamente.');
+    const friendly = Object.entries(FRIENDLY_ERRORS).find(([k]) => err.message.includes(k));
+    throw new Error(friendly ? friendly[1] : (err.message || 'Erro desconhecido'));
+  }
+}
+
+async function apiGet(path) { return apiFetch(path); }
+async function apiPost(path, body) { return apiFetch(path, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) }); }
+async function apiPut(path, body) { return apiFetch(path, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) }); }
+async function apiDelete(path) { return apiFetch(path, { method:'DELETE' }); }
+
 
 // ═══ MODALS ═══
 function closeModal(type){document.getElementById('modal-'+type).classList.remove('open');}
@@ -1263,11 +1379,58 @@ function exportEventToCalendar(id) {
 // ═══ UTILS ═══
 function gid(obj){return String(obj._id||obj.id||'');}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function toast(msg){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
+// ═══ OFFLINE MONITORING ═══
+function updateOnlineStatus() {
+  const banner = document.getElementById('offline-banner');
+  if (!banner) return;
+  if (!navigator.onLine) {
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+window.addEventListener('online',  updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+
+// ═══ BUTTON LOADING STATE ═══
+function setButtonLoading(btn, loading, originalText) {
+  if (!btn) return;
+  if (loading) {
+    btn.dataset.original = btn.innerHTML;
+    btn.innerHTML = `<span class="spinner-inline"></span> Aguarde...`;
+    btn.classList.add('btn-loading');
+  } else {
+    btn.innerHTML = originalText || btn.dataset.original || btn.innerHTML;
+    btn.classList.remove('btn-loading');
+  }
+}
+
+// ═══ SKELETON LOADER ═══
+function showSkeletons(containerId, count = 3) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = Array.from({length: count}).map(() =>
+    `<div class="skeleton skeleton-row"></div>`
+  ).join('');
+}
+
+// ═══ TOAST ═══
+function toast(msg, type='info') {
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), type==='error' ? 5000 : 3000);
+}
+function toastError(msg) { toast(msg, 'error'); }
+function toastOk(msg) { toast(msg, 'success'); }
+function toastWarn(msg) { toast(msg, 'warning'); }
 
 init();
 initEmailStatus();
 checkResetTokenInUrl();
+updateOnlineStatus();
 </script>
 </body>
 </html>
